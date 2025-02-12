@@ -1,0 +1,20 @@
+{
+  "better-extension-manager.workspace": [
+    "bradlc.vscode-tailwindcss",
+    "chamboug.js-auto-backticks",
+    "dbaeumer.vscode-eslint",
+    "jsjzh.color-converter",
+    "ms-vscode.vscode-typescript-next",
+    "oven.bun-vscode",
+    "prisma.prisma",
+    "qcz.restart-ts-server-button",
+    "redhat.vscode-yaml",
+    "vincaslt.highlight-matching-tag",
+    "yoavbls.pretty-ts-errors",
+    "yzhang.markdown-all-in-one",
+    "ms-vsliveshare.vsliveshare",
+    "marcbruederlin.next-icons"
+  ],
+  "workbench.iconTheme": "next-icons-light",
+  "typescript.tsdk": "node_modules\\typescript\\lib"
+}
