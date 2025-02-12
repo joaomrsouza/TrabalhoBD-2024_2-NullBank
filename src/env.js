@@ -14,6 +14,11 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+
+    DB_HOST: z.string(),
+    DB_NAME: z.string(),
+    DB_PASS: z.string(),
+    DB_USER: z.string(),
   },
 
   /**
@@ -37,6 +42,11 @@ export const env = createEnv({
   runtimeEnv: {
     AUTH_SECRET: process.env.AUTH_SECRET,
     NODE_ENV: process.env.NODE_ENV,
+
+    DB_HOST: process.env.DB_HOST,
+    DB_NAME: process.env.DB_NAME,
+    DB_PASS: process.env.DB_PASS,
+    DB_USER: process.env.DB_USER,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**

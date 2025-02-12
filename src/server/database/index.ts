@@ -1,5 +1,6 @@
 import "server-only";
 
+import { env } from "@/env";
 import { zip } from "lodash";
 import { createConnection, type Connection } from "mysql2/promise";
 import { databaseQueries } from "./queries";
@@ -10,10 +11,10 @@ export class Database {
 
   async connect() {
     this._connection = await createConnection({
-      database: "equipe521459",
-      host: "localhost",
-      password: "root",
-      user: "root",
+      database: env.DB_NAME,
+      host: env.DB_HOST,
+      password: env.DB_PASS,
+      user: env.DB_USER,
     });
 
     return this;
