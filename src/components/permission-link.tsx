@@ -6,7 +6,7 @@ import Link from "next/link";
 import React from "react";
 
 interface PermissionLinkProps {
-  cargo: CargoUser;
+  cargo: Array<CargoUser> | CargoUser;
   children: React.ReactNode;
   href: string;
 }
