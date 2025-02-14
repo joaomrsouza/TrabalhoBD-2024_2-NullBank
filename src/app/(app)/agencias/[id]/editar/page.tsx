@@ -12,11 +12,11 @@ import { notFound } from "next/navigation";
 import { AgenciasForm } from "../../_components/agencias-form";
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-  const { id } = props.params;
+  const { id } = await props.params;
 
   const notFound = { title: "Agência não encontrada" };
 
@@ -31,7 +31,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 }
 
 export default async function EditarAgencia(props: PageProps) {
-  const { id } = props.params;
+  const { id } = await props.params;
 
   await Permission.safeGetAuthUser(["dba"]);
 
