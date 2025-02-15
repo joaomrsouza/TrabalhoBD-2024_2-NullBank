@@ -4,4 +4,5 @@ export { useDebounce } from "./use-debounce";
 export { useHandleSubmitAction } from "./use-handle-submit-action";
 export { useHandleSubmitMutation } from "./use-handle-submit-mutation";
 export { usePermission } from "./use-permission";
+export { useInputMask } from "./use-input-mask";
 export { useSearchQuery } from "./use-search-query";
