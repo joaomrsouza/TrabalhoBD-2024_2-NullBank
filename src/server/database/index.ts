@@ -14,6 +14,7 @@ export class Database {
       database: env.DB_NAME,
       host: env.DB_HOST,
       password: env.DB_PASS,
+      port: env.DB_PORT,
       user: env.DB_USER,
     });
 
