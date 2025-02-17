@@ -1,7 +1,7 @@
-import { db } from "..";
 import { type z } from "@/lib/zod";
 import { type schemas } from "@/schemas";
 import { type CountResponse, type OpResponse } from ".";
+import { db } from "..";
 
 export type Cliente = {
   cpf: string;
@@ -19,9 +19,9 @@ export type Cliente = {
   rg_uf: string;
 };
 
-export type ClienteUpsert = Omit<Cliente, "data_nasc"> & {
+export type ClienteUpsert = {
   data_nasc: string;
-}
+} & Omit<Cliente, "data_nasc">;
 
 type FilteredPageParams = z.infer<typeof schemas.cliente.searchParams>;
 

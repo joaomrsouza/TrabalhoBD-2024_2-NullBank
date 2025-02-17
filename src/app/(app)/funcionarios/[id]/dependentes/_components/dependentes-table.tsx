@@ -6,21 +6,21 @@ import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 import { Button } from "@/components/ui/button";
 import { useDataTable } from "@/hooks";
 import { type DataTableFilterField } from "@/hooks/use-data-table";
-import { type Cliente } from "@/server/database/queries/clientes";
-import { formatCurrency, formatData } from "@/server/utils/formaters";
+import { type Dependente } from "@/server/database/queries/dependentes";
+import { formatData } from "@/server/utils/formaters";
 import { type ColumnDef } from "@tanstack/react-table";
 import { TextSearchIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
-type TableData = Cliente;
+type TableData = Dependente;
 
-interface ClienteTableProps {
+interface DependenteTableProps {
   data: TableData[];
   pageCount: number;
 }
 
-export function ClienteTable(props: ClienteTableProps) {
+export function DependenteTable(props: DependenteTableProps) {
   const { data, pageCount } = props;
 
   const columns = React.useMemo(() => getColumns(), []);
@@ -53,7 +53,7 @@ function getColumns(): ColumnDef<TableData>[] {
           title="Visualizar registro"
           aria-label="Visualizar registro"
         >
-          <Link href={`./clientes/${row.original.cpf}`}>
+          <Link href={`./dependentes/${row.original.nome_dependente}`}>
             <TextSearchIcon className="mr-2 size-4" />
             Visualizar
           </Link>
@@ -67,18 +67,21 @@ function getColumns(): ColumnDef<TableData>[] {
       id: "access",
     },
     {
-      accessorKey: "cpf",
+      accessorKey: "nome_dependente",
       enableHiding: false,
       enableSorting: false,
       header: ({ column }) => (
-        <DataTableColumnHeader title="CPF" column={column} />
+        <DataTableColumnHeader title="Nome" column={column} />
       ),
     },
     {
-      accessorKey: "nome",
+      accessorKey: "funcionarios_matricula",
       enableSorting: false,
       header: ({ column }) => (
-        <DataTableColumnHeader title="Nome" column={column} />
+        <DataTableColumnHeader
+          column={column}
+          title="Funcionário Responsável"
+        />
       ),
     },
     {
@@ -90,10 +93,17 @@ function getColumns(): ColumnDef<TableData>[] {
       ),
     },
     {
-      accessorKey: "rg_num",
+      accessorKey: "parentesco",
       enableSorting: false,
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Num. RG" />
+        <DataTableColumnHeader column={column} title="Parentesco" />
+      ),
+    },
+    {
+      accessorKey: "idade",
+      enableSorting: false,
+      header: ({ column }) => (
+        <DataTableColumnHeader title="Idade" column={column} />
       ),
     },
   ];
@@ -102,10 +112,10 @@ function getColumns(): ColumnDef<TableData>[] {
 function getFilters(): DataTableFilterField<TableData>[] {
   return [
     {
-      label: "CPF",
-      placeholder: "Filtrar CPF...",
+      label: "Funcionário Responsável",
+      placeholder: "Filtrar Funcionário Responsável...",
       type: "text",
-      value: "cpf",
+      value: "funcionarios_matricula",
     },
     {
       label: "Nome",

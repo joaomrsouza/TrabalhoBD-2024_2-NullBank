@@ -6,5 +6,5 @@ export function formatCurrency(value: number) {
 }
 
 export function formatData(value: Date) {
-  return value.toISOString().split("T")[0]?.split("-").reverse().join("/")
+  return value.toISOString().split("T")[0]?.split("-").reverse().join("/");
 }

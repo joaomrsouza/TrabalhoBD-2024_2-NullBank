@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import {
-  FieldPath,
-  FieldValues,
-  PathValue,
-  UseFormReturn,
+  type FieldPath,
+  type FieldValues,
+  type PathValue,
+  type UseFormReturn,
 } from "react-hook-form";
 
 export function useInputMask<
@@ -14,7 +14,7 @@ export function useInputMask<
   field: U,
   mask: (value: PathValue<T, U>) => PathValue<T, U>,
 ) {
-  const { watch, setValue } = form;
+  const { setValue, watch } = form;
 
   const value = watch(field);
 

@@ -13,7 +13,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import { type Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ShowClienteActions } from "./_components/show-clientes-actions";
+import { ShowFuncionarioActions } from "./_components/show-funcionarios-actions";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -22,29 +22,33 @@ interface PageProps {
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const { id } = await props.params;
 
-  const notFound = { title: "Cliente não encontrado" };
+  const notFound = { title: "Funcionário não encontrado" };
 
-  const idValido = schemas.string.safeParse(id);
+  const idValido = schemas.id.safeParse(id);
   if (!idValido.success) return notFound;
 
-  const cliente = await db.queries.clientes.getNomeByCpf(idValido.data);
+  const funcionario = await db.queries.funcionarios.getNomeByMatricula(
+    idValido.data,
+  );
 
-  if (!cliente) return notFound;
+  if (!funcionario) return notFound;
 
-  return { title: cliente.nome };
+  return { title: funcionario.nome };
 }
 
-export default async function ExibirCliente(props: PageProps) {
+export default async function ExibirFuncionario(props: PageProps) {
   const { id } = await props.params;
 
   const user = await Permission.safeGetAuthUser(["dba"]);
 
-  const idValido = schemas.string.safeParse(id);
+  const idValido = schemas.id.safeParse(id);
   if (!idValido.success) return notFound();
 
-  const cliente = await db.queries.clientes.getByCpf(idValido.data);
+  const funcionario = await db.queries.funcionarios.getByMatricula(
+    idValido.data,
+  );
 
-  if (!cliente) return notFound();
+  if (!funcionario) return notFound();
 
   const canEdit = Permission.temPermissaoDeAcesso(["dba"], user);
   const canDelete = Permission.temPermissaoDeAcesso(["dba"], user);
@@ -53,53 +57,46 @@ export default async function ExibirCliente(props: PageProps) {
     <PageContainer>
       <div className="flex items-center justify-between">
         <PageHeader>
-          {cliente.nome} ({cliente.cpf})
+          {funcionario.nome} ({funcionario.matricula})
         </PageHeader>
         <Button asChild variant="ghost">
           <Link href="./">
             <ArrowLeftIcon className="mr-2 size-4" />
-            Clientes
+            Funcionários
           </Link>
         </Button>
       </div>
       <Separator />
 
-      <ShowClienteActions
+      <ShowFuncionarioActions
         canEdit={canEdit}
         id={idValido.data}
         canDelete={canDelete}
       />
       <ShowSection title="Cadastro">
         <ShowGroup>
-          <ShowField label="CPF">{cliente.cpf}</ShowField>
-          <ShowField label="Nome">{cliente.nome}</ShowField>
+          <ShowField label="Nome">{funcionario.nome}</ShowField>
           <ShowField label="Data Nascimento">
-            {formatData(cliente.data_nasc)}
+            {formatData(funcionario.data_nasc)}
           </ShowField>
+          <ShowField label="Gênero">{funcionario.genero}</ShowField>
         </ShowGroup>
 
         <ShowGroup>
-          <ShowField label="Número do RG">{cliente.rg_num}</ShowField>
-          <ShowField label="Órgão Emissor">
-            {cliente.rg_orgao_emissor}
+          <ShowField label="Número da Agência">
+            {funcionario.agencias_num_ag}
           </ShowField>
-          <ShowField label="UF">{cliente.rg_uf}</ShowField>
+          <ShowField label="Matrícula">{funcionario.matricula}</ShowField>
+          <ShowField label="Cargo">{funcionario.cargo}</ShowField>
+          <ShowField label="Salário">{funcionario.salario}</ShowField>
         </ShowGroup>
 
         <ShowGroup>
-          <ShowField label="Tipo de Endereço">{cliente.end_tipo}</ShowField>
-          <ShowField label="Logradouro">{cliente.end_logradouro}</ShowField>
-          <ShowField label="Número">{cliente.end_numero}</ShowField>
-          <ShowField label="Bairro">{cliente.end_bairro}</ShowField>
-        </ShowGroup>
-
-        <ShowGroup>
-          <ShowField label="Cidade">{cliente.end_cidade}</ShowField>
-          <ShowField label="Estado">{cliente.end_estado}</ShowField>
-          <ShowField label="CEP">{cliente.end_cep}</ShowField>
+          <ShowField label="Endereço">{funcionario.endereco}</ShowField>
+          <ShowField label="Cidade">{funcionario.cidade}</ShowField>
         </ShowGroup>
       </ShowSection>
-      <ShowClienteActions
+      <ShowFuncionarioActions
         canEdit={canEdit}
         id={idValido.data}
         canDelete={canDelete}

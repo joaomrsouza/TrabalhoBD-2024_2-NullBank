@@ -6,21 +6,21 @@ import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 import { Button } from "@/components/ui/button";
 import { useDataTable } from "@/hooks";
 import { type DataTableFilterField } from "@/hooks/use-data-table";
-import { type Cliente } from "@/server/database/queries/clientes";
+import { type Funcionario } from "@/server/database/queries/funcionarios";
 import { formatCurrency, formatData } from "@/server/utils/formaters";
 import { type ColumnDef } from "@tanstack/react-table";
 import { TextSearchIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
-type TableData = Cliente;
+type TableData = Funcionario;
 
-interface ClienteTableProps {
+interface FuncionarioTableProps {
   data: TableData[];
   pageCount: number;
 }
 
-export function ClienteTable(props: ClienteTableProps) {
+export function FuncionarioTable(props: FuncionarioTableProps) {
   const { data, pageCount } = props;
 
   const columns = React.useMemo(() => getColumns(), []);
@@ -30,7 +30,7 @@ export function ClienteTable(props: ClienteTableProps) {
     columns,
     data,
     defaultPerPage: 10,
-    defaultSort: "nome.asc",
+    defaultSort: "matricula.asc",
     filterFields: filters,
     pageCount,
   });
@@ -53,7 +53,7 @@ function getColumns(): ColumnDef<TableData>[] {
           title="Visualizar registro"
           aria-label="Visualizar registro"
         >
-          <Link href={`./clientes/${row.original.cpf}`}>
+          <Link href={`./funcionarios/${row.original.matricula}`}>
             <TextSearchIcon className="mr-2 size-4" />
             Visualizar
           </Link>
@@ -67,11 +67,11 @@ function getColumns(): ColumnDef<TableData>[] {
       id: "access",
     },
     {
-      accessorKey: "cpf",
+      accessorKey: "matricula",
       enableHiding: false,
       enableSorting: false,
       header: ({ column }) => (
-        <DataTableColumnHeader title="CPF" column={column} />
+        <DataTableColumnHeader column={column} title="Matrícula" />
       ),
     },
     {
@@ -90,10 +90,46 @@ function getColumns(): ColumnDef<TableData>[] {
       ),
     },
     {
-      accessorKey: "rg_num",
+      accessorKey: "genero",
       enableSorting: false,
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Num. RG" />
+        <DataTableColumnHeader title="Gênero" column={column} />
+      ),
+    },
+    {
+      accessorKey: "cargo",
+      enableSorting: false,
+      header: ({ column }) => (
+        <DataTableColumnHeader title="Cargo" column={column} />
+      ),
+    },
+    {
+      accessorKey: "agencias_num_ag",
+      enableSorting: false,
+      header: ({ column }) => (
+        <DataTableColumnHeader title="Número" column={column} />
+      ),
+    },
+    {
+      accessorKey: "salario",
+      cell: ({ getValue }) => formatCurrency(getValue<number>()),
+      enableSorting: false,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Salário" />
+      ),
+    },
+    {
+      accessorKey: "endereco",
+      enableSorting: false,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Endereço" />
+      ),
+    },
+    {
+      accessorKey: "cidade",
+      enableSorting: false,
+      header: ({ column }) => (
+        <DataTableColumnHeader title="Cidade" column={column} />
       ),
     },
   ];
@@ -102,10 +138,10 @@ function getColumns(): ColumnDef<TableData>[] {
 function getFilters(): DataTableFilterField<TableData>[] {
   return [
     {
-      label: "CPF",
-      placeholder: "Filtrar CPF...",
+      label: "Matrícula",
+      placeholder: "Filtrar Matrícula...",
       type: "text",
-      value: "cpf",
+      value: "matricula",
     },
     {
       label: "Nome",

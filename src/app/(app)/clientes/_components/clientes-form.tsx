@@ -17,30 +17,30 @@ import { toast } from "sonner";
 type FormData = z.infer<typeof schemas.cliente.form>;
 
 interface ClientesFormProps {
-  data?: Partial<FormData>;
   cpf?: string;
+  data?: Partial<FormData>;
 }
 
 export function ClientesForm(props: ClientesFormProps) {
-  const { data, cpf } = props;
+  const { cpf, data } = props;
 
   const editando = cpf !== undefined;
 
   const form = useForm<FormData>({
     defaultValues: {
-     cpf: "",
-     data_nasc: "",
-     end_bairro: "",
-     end_cep: "",
-     end_cidade: "",
-     end_estado: "",
-     end_logradouro: "",
-     end_numero: 0,
-     end_tipo: "",
-     nome: "",
-     rg_num: "",
-     rg_orgao_emissor: "",
-     rg_uf: "",
+      cpf: "",
+      data_nasc: "",
+      end_bairro: "",
+      end_cep: "",
+      end_cidade: "",
+      end_estado: "",
+      end_logradouro: "",
+      end_numero: 0,
+      end_tipo: "",
+      nome: "",
+      rg_num: "",
+      rg_orgao_emissor: "",
+      rg_uf: "",
       ...data,
     },
     resolver: zodResolver(schemas.cliente.form),
@@ -61,35 +61,98 @@ export function ClientesForm(props: ClientesFormProps) {
     },
   });
 
-  useInputMask(form, "cpf", value => value ? value.replace(/\D/g, "") : value)
-  useInputMask(form, "end_cep", value => value ? value.replace(/\D/g, "") : value)
+  useInputMask(form, "cpf", value =>
+    value ? value.replace(/\D/g, "") : value,
+  );
+  useInputMask(form, "end_cep", value =>
+    value ? value.replace(/\D/g, "") : value,
+  );
 
   return (
     <FormContainer form={form} handleSubmit={handleSubmit}>
-
       <FormGroup>
-        <FormInput<FormData> required label="CPF (Somente Números)" name="cpf" maxLength={11} />
-        <FormInput<FormData> required label="Nome" name="nome" maxLength={80}/>
-        <FormInput<FormData> required label="Data Nascimento" name="data_nasc" type="date" />
+        <FormInput<FormData>
+          required
+          name="cpf"
+          maxLength={11}
+          label="CPF (Somente Números)"
+        />
+        <FormInput<FormData> required name="nome" label="Nome" maxLength={80} />
+        <FormInput<FormData>
+          required
+          type="date"
+          name="data_nasc"
+          label="Data Nascimento"
+        />
       </FormGroup>
 
       <FormGroup>
-        <FormInput<FormData> required label="Número do RG" name="rg_num" maxLength={15}/>
-        <FormInput<FormData> required label="Orgão Emissor" name="rg_orgao_emissor" maxLength={80}/>
-        <FormSelect<FormData> required label="UF" name="rg_uf" options={ufs.map(uf =>({label:uf, value: uf}))} />
+        <FormInput<FormData>
+          required
+          name="rg_num"
+          maxLength={15}
+          label="Número do RG"
+        />
+        <FormInput<FormData>
+          required
+          maxLength={80}
+          label="Orgão Emissor"
+          name="rg_orgao_emissor"
+        />
+        <FormSelect<FormData>
+          required
+          label="UF"
+          name="rg_uf"
+          options={ufs.map(uf => ({ label: uf, value: uf }))}
+        />
       </FormGroup>
 
       <FormGroup>
-        <FormInput<FormData> required label="Tipo de Endereço" name="end_tipo" maxLength={80} />
-        <FormInput<FormData> required label="Logradouro" name="end_logradouro" maxLength={80} />
-        <FormInput<FormData> required label="Número" name="end_numero" type="number" />
-        <FormInput<FormData> required label="Bairro" name="end_bairro" maxLength={80}/>
+        <FormInput<FormData>
+          required
+          maxLength={80}
+          name="end_tipo"
+          label="Tipo de Endereço"
+        />
+        <FormInput<FormData>
+          required
+          maxLength={80}
+          label="Logradouro"
+          name="end_logradouro"
+        />
+        <FormInput<FormData>
+          required
+          type="number"
+          label="Número"
+          name="end_numero"
+        />
+        <FormInput<FormData>
+          required
+          label="Bairro"
+          maxLength={80}
+          name="end_bairro"
+        />
       </FormGroup>
 
       <FormGroup>
-        <FormInput<FormData> required label="Cidade" name="end_cidade" maxLength={80} />
-        <FormSelect<FormData> required label="Estado" name="end_estado" options={ufs.map(uf =>({label:uf, value: uf}))} />
-        <FormInput<FormData> required label="CEP (Somente Números)" name="end_cep" maxLength={8}/>
+        <FormInput<FormData>
+          required
+          label="Cidade"
+          maxLength={80}
+          name="end_cidade"
+        />
+        <FormSelect<FormData>
+          required
+          label="Estado"
+          name="end_estado"
+          options={ufs.map(uf => ({ label: uf, value: uf }))}
+        />
+        <FormInput<FormData>
+          required
+          maxLength={8}
+          name="end_cep"
+          label="CEP (Somente Números)"
+        />
       </FormGroup>
 
       <FormActions />
