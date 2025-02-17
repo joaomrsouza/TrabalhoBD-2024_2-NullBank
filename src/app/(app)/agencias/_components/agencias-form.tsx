@@ -41,10 +41,6 @@ export function AgenciasForm(props: AgenciasFormProps) {
       toast.success(
         `Agência ${data?.nome_ag} ${editando ? "atualizada" : "criada"} com sucesso!`,
       );
-      // TODO: invalidade search query
-      // await getQueryClient().invalidateQueries({
-      //   queryKey: ["/api/auth/temPermissao"],
-      // });
       router.push(`/agencias${editando ? "/" + num_ag : ""}`);
     },
   });
