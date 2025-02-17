@@ -28,7 +28,8 @@ export function ClientesForm(props: ClientesFormProps) {
 
   const form = useForm<FormData>({
     defaultValues: {
-      cpf: "",
+      cpf: editando ? cpf : "",
+      create: !editando,
       data_nasc: "",
       end_bairro: "",
       end_cep: "",
@@ -48,20 +49,19 @@ export function ClientesForm(props: ClientesFormProps) {
 
   const { handleSubmit } = useHandleSubmitMutation({
     form,
-    mutationCall: api.clientes.upsert, // TODO: Ajeitar esse upsert
+    mutationCall: api.clientes.upsert,
     async onSuccess(data, router) {
       toast.success(
         `Cliente ${data?.cpf} ${editando ? "atualizado" : "criado"} com sucesso!`,
       );
-      // TODO: invalidade search query
-      // await getQueryClient().invalidateQueries({
-      //   queryKey: ["/api/auth/temPermissao"],
-      // });
       router.push(`/clientes${editando ? "/" + cpf : ""}`);
     },
   });
 
   useInputMask(form, "cpf", value =>
+    value ? value.replace(/\D/g, "") : value,
+  );
+  useInputMask(form, "rg_num", value =>
     value ? value.replace(/\D/g, "") : value,
   );
   useInputMask(form, "end_cep", value =>
@@ -71,12 +71,14 @@ export function ClientesForm(props: ClientesFormProps) {
   return (
     <FormContainer form={form} handleSubmit={handleSubmit}>
       <FormGroup>
-        <FormInput<FormData>
-          required
-          name="cpf"
-          maxLength={11}
-          label="CPF (Somente Números)"
-        />
+        {!editando && (
+          <FormInput<FormData>
+            required
+            name="cpf"
+            maxLength={11}
+            label="CPF (Somente Números)"
+          />
+        )}
         <FormInput<FormData> required name="nome" label="Nome" maxLength={80} />
         <FormInput<FormData>
           required
@@ -91,7 +93,7 @@ export function ClientesForm(props: ClientesFormProps) {
           required
           name="rg_num"
           maxLength={15}
-          label="Número do RG"
+          label="Número do RG (Somente Números)"
         />
         <FormInput<FormData>
           required

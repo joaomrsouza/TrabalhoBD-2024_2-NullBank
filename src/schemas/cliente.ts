@@ -2,7 +2,9 @@ import { z } from "@/lib/zod";
 import { addQueryParams } from "@/server/utils/schemas";
 
 export const form = z.object({
-  cpf: z.string().trim().length(11, "CPF deve conter 11 caracteres"),
+  cpf: z.string().trim().length(11, "CPF deve conter 11 caracteres").optional(),
+
+  create: z.boolean().optional(),
 
   data_nasc: z.string().date("A data de nascimento deve ser aaaa-mm-dd"),
 
@@ -32,7 +34,11 @@ export const form = z.object({
     .length(2, "A UF do RG deve ser um código de estado (Ex: 'CE', SP)"),
 });
 
-export const create = form.strict();
+export const create = form
+  .extend({
+    cpf: z.string().trim().length(11, "CPF deve conter 11 caracteres"),
+  })
+  .strict();
 
 const nonStrictUpdate = form.omit({ cpf: true });
 

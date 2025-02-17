@@ -40,7 +40,6 @@ VALUES
   (3, 'Gabriela Freitas', '1992-09-23', 'não-binário', 'Avenida das Flores', 'Marco', 'atendente', 3000.00, 'KlVi4APLsJL+QiQOpL+Jde9FcF8msnU8WUMAbeWqajU=', 'D3q7C5D+WOVb1ES5fjEHmL/okMmzmhksvuSfXeLSKIQ='),
   (1, 'Thales Rocha', '1999-10-06', 'masculino', 'Rua Castro Freitas', 'Sobral', 'gerente', 7500.00, 'KlVi4APLsJL+QiQOpL+Jde9FcF8msnU8WUMAbeWqajU=', 'D3q7C5D+WOVb1ES5fjEHmL/okMmzmhksvuSfXeLSKIQ=');
 
--- TODO: Ter mais de um gerente em uma agência, e algumas contas serem gerenciadas por ele
 INSERT INTO `contas` (agencias_num_ag, funcionarios_matricula_gerente, tipo, saldo, senha, salt) VALUES
   (1, 1, 'corrente', 1500.00, 'KlVi4APLsJL+QiQOpL+Jde9FcF8msnU8WUMAbeWqajU=', 'D3q7C5D+WOVb1ES5fjEHmL/okMmzmhksvuSfXeLSKIQ='),
   (1, 1, 'poupança', 2000.00, 'KlVi4APLsJL+QiQOpL+Jde9FcF8msnU8WUMAbeWqajU=', 'D3q7C5D+WOVb1ES5fjEHmL/okMmzmhksvuSfXeLSKIQ='),
