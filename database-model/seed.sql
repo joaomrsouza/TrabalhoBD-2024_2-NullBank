@@ -117,13 +117,14 @@ INSERT INTO `transacoes` (contas_num_conta_origem, contas_num_conta_destino, tip
   (3, NULL, 'pagamento', 20.00),
   (1, 3, 'PIX', 800.00);
 
-INSERT INTO `dependentes` (nome_dependente, funcionarios_matricula, data_nasc, parentesco, idade) VALUES
-  ('Mariana Alves', 1, '1992-07-16', 'cônjuge', 33),
-  ('Lucas Moreira', 1, '1992-08-12', 'filho(a)', 33),
-  ('Renata Pereira', 1, '1980-08-12', 'genitor(a)', 45),
-  ('Thiago Martins', 1, '1984-10-22', 'filho(a)', 41),
-  ('Camila Rocha', 1, '1996-02-18', 'filho(a)', 29),
-  ('Carlos Eduardo', 3, '1992-11-10', 'cônjuge', 33);
+-- ! ALTERAÇÃO: Removido idade, a idade deve ser calculada pelo banco de dados
+INSERT INTO `dependentes` (nome_dependente, funcionarios_matricula, data_nasc, parentesco) VALUES
+  ('Mariana Alves', 1, '1992-07-16', 'cônjuge'),
+  ('Lucas Moreira', 1, '1992-08-12', 'filho(a)'),
+  ('Renata Pereira', 1, '1980-08-12', 'genitor(a)'),
+  ('Thiago Martins', 1, '1984-10-22', 'filho(a)'),
+  ('Camila Rocha', 1, '1996-02-18', 'filho(a)'),
+  ('Carlos Eduardo', 3, '1992-11-10', 'cônjuge');
 
 INSERT INTO `contas_corrente` (contas_num_conta, data_aniversario) VALUES
   (1, '2001-12-11'),
