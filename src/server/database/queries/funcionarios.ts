@@ -1,14 +1,9 @@
 import { type z } from "@/lib/zod";
 import { type schemas } from "@/schemas";
 import { AuthService } from "@/server/services/auth";
+import { type Cargo, type Genero } from "@/utils/enums";
 import { type CountResponse, type OpResponse } from ".";
 import { db } from "..";
-
-export const Generos = ["masculino", "feminino", "não-binário"] as const;
-export type Genero = (typeof Generos)[number];
-
-export const Cargos = ["gerente", "atendente", "caixa"] as const;
-export type Cargo = (typeof Cargos)[number];
 
 export type Funcionario = {
   agencias_num_ag: number;
@@ -87,7 +82,7 @@ export async function insert(data: FuncionarioUpsert) {
     INSERT INTO funcionarios
       (agencias_num_ag, cargo, cidade, data_nasc, endereco, genero, nome, salario, salt, senha)
     VALUES
-      (${data.agencias_num_ag}, ${data.cargo}, ${data.cidade}, ${data.data_nasc}, ${data.endereco}, ${data.genero}, ${data.nome}, ${data.salario}, ${salt}, ${senha})
+      (${data.agencias_num_ag}, ${data.cargo}, ${data.cidade}, ${data.data_nasc}, ${data.endereco}, ${data.genero}, ${data.nome}, ${data.salario}, ${salt.toString("base64")}, ${senha.toString("base64")})
   `;
 
   const newFuncionario = await db.sql<Array<Funcionario>>`
@@ -114,8 +109,8 @@ export async function updateByMatricula(
         genero = ${data.genero},
         nome = ${data.nome},
         salario = ${data.salario},
-        salt = ${salt},
-        senha = ${senha}
+        salt = ${salt.toString("base64")},
+        senha = ${senha.toString("base64")}
       WHERE matricula = ${matricula}
     `;
   } else {

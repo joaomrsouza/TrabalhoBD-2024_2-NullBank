@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useDataTable } from "@/hooks";
 import { type DataTableFilterField } from "@/hooks/use-data-table";
 import { type Funcionario } from "@/server/database/queries/funcionarios";
-import { formatCurrency, formatData } from "@/server/utils/formaters";
+import { formatCurrency, formatData } from "@/utils/formaters";
 import { type ColumnDef } from "@tanstack/react-table";
 import { TextSearchIcon } from "lucide-react";
 import Link from "next/link";

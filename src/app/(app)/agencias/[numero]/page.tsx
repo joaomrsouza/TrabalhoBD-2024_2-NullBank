@@ -8,47 +8,43 @@ import { Separator } from "@/components/ui/separator";
 import { schemas } from "@/schemas";
 import { db } from "@/server/database";
 import { Permission } from "@/server/services/permission";
-import { formatData } from "@/server/utils/formaters";
+import { formatCurrency } from "@/utils/formaters";
 import { ArrowLeftIcon } from "lucide-react";
 import { type Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ShowDependenteActions } from "./_components/show-dependentes-actions";
+import { ShowAgenciaActions } from "./_components/show-agencia-actions";
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ numero: string }>;
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-  const { id } = await props.params;
+  const { numero } = await props.params;
 
-  const notFound = { title: "Dependente não encontrado" };
+  const notFound = { title: "Agência não encontrada" };
 
-  const idValido = schemas.string.safeParse(id);
-  if (!idValido.success) return notFound;
+  const numeroValido = schemas.number.safeParse(numero);
+  if (!numeroValido.success) return notFound;
 
-  const dependente = await db.queries.dependentes.getNomeByNomeDependente(
-    idValido.data,
-  );
+  const agencia = await db.queries.agencias.getNomeByNumero(numeroValido.data);
 
-  if (!dependente) return notFound;
+  if (!agencia) return notFound;
 
-  return { title: dependente.nome };
+  return { title: agencia.nome_ag };
 }
 
-export default async function ExibirDependente(props: PageProps) {
-  const { id } = await props.params;
+export default async function ExibirAgencia(props: PageProps) {
+  const { numero } = await props.params;
 
   const user = await Permission.safeGetAuthUser(["dba"]);
 
-  const idValido = schemas.string.safeParse(id);
-  if (!idValido.success) return notFound();
+  const numeroValido = schemas.number.safeParse(numero);
+  if (!numeroValido.success) return notFound();
 
-  const dependente = await db.queries.dependentes.getNomeByNomeDependente(
-    idValido.data,
-  );
+  const agencia = await db.queries.agencias.getByNumero(numeroValido.data);
 
-  if (!dependente) return notFound();
+  if (!agencia) return notFound();
 
   const canEdit = Permission.temPermissaoDeAcesso(["dba"], user);
   const canDelete = Permission.temPermissaoDeAcesso(["dba"], user);
@@ -56,43 +52,40 @@ export default async function ExibirDependente(props: PageProps) {
   return (
     <PageContainer>
       <div className="flex items-center justify-between">
-        <PageHeader>{depedente.nome_dependente}</PageHeader>
+        <PageHeader>
+          {agencia.nome_ag} ({agencia.num_ag})
+        </PageHeader>
         <Button asChild variant="ghost">
           <Link href="./">
             <ArrowLeftIcon className="mr-2 size-4" />
-            Dependentes
+            Agências
           </Link>
         </Button>
       </div>
       <Separator />
 
-      <ShowDependenteActions
+      <ShowAgenciaActions
         canEdit={canEdit}
-        id={idValido.data}
         canDelete={canDelete}
+        numero={numeroValido.data}
       />
       <ShowSection title="Cadastro">
         <ShowGroup>
-          <ShowField label="Nome Dependente">
-            {dependente.nome_dependente}
-          </ShowField>
-          <ShowField label="Data Nascimento">
-            {formatData(dependente.data_nasc)}
-          </ShowField>
-          <ShowField label="Idade">{dependente.idade}</ShowField>
+          <ShowField label="Número">{agencia.num_ag}</ShowField>
+          <ShowField label="Nome">{agencia.nome_ag}</ShowField>
         </ShowGroup>
 
         <ShowGroup>
-          <ShowField label="Funcionário Responsável">
-            {dependente.funcionarios_matricula}
+          <ShowField label="Cidade">{agencia.cidade_ag}</ShowField>
+          <ShowField label="Sal. Total">
+            {formatCurrency(agencia.sal_total)}
           </ShowField>
-          <ShowField label="Parentesco">{dependente.parentesco}</ShowField>
         </ShowGroup>
       </ShowSection>
-      <ShowDependenteActions
+      <ShowAgenciaActions
         canEdit={canEdit}
-        id={idValido.data}
         canDelete={canDelete}
+        numero={numeroValido.data}
       />
     </PageContainer>
   );

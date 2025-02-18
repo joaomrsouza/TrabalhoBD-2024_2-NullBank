@@ -100,3 +100,15 @@ export async function deleteByNumero(numero: number) {
     WHERE num_ag = ${numero}
   `;
 }
+
+export async function list(search: string) {
+  const searchNome = Number(!search);
+
+  const result = await db.sql<Array<Pick<Agencia, "nome_ag" | "num_ag">>>`
+    SELECT num_ag, nome_ag FROM agencias
+    WHERE
+      (nome_ag LIKE CONCAT('%', ${search ?? ""}, '%') OR ${searchNome} = 1)
+  `;
+
+  return result;
+}

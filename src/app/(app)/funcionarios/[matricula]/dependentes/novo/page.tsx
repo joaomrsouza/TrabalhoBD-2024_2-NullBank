@@ -9,58 +9,57 @@ import { ArrowLeftIcon } from "lucide-react";
 import { type Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { DependentesForm } from "../../_components/dependentes-form";
+import { DependentesForm } from "../_components/dependentes-form";
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ matricula: string }>;
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-  const { id } = await props.params;
+  const { matricula } = await props.params;
 
-  const notFound = { title: "Dependente não encontrado" };
+  const notFound = { title: "Funcionário não encontrado" };
 
-  const idValido = schemas.string.safeParse(id);
-  if (!idValido.success) return notFound;
+  const matriculaValida = schemas.number.safeParse(matricula);
+  if (!matriculaValida.success) return notFound;
 
-  const dependente = await db.queries.dependentes.getNomeByNomeDependente(
-    idValido.data,
+  const funcionario = await db.queries.funcionarios.getNomeByMatricula(
+    matriculaValida.data,
   );
 
-  if (!dependente) return notFound;
+  if (!funcionario) return notFound;
 
-  return { title: `Editar ${dependente.nome}` };
+  return { title: `Novo dependente de ${funcionario.nome}` };
 }
 
-export default async function EditarDependente(props: PageProps) {
-  const { id } = await props.params;
+export default async function NovoDependente(props: PageProps) {
+  const { matricula } = await props.params;
 
   await Permission.safeGetAuthUser(["dba"]);
 
-  const idValido = schemas.string.safeParse(id);
-  if (!idValido.success) return notFound();
+  const matriculaValida = schemas.number.safeParse(matricula);
+  if (!matriculaValida.success) return notFound();
 
-  const dependente = await db.queries.dependentes.getByNomeDependente(
-    idValido.data,
+  const funcionario = await db.queries.funcionarios.getNomeByMatricula(
+    matriculaValida.data,
   );
-  const parsed = schemas.dependente.prune.safeParse(dependente);
 
-  if (!parsed.success) notFound();
+  if (!funcionario) return notFound();
 
   return (
     <PageContainer>
       <div className="flex items-center justify-between">
-        <PageHeader>Editar Dependente</PageHeader>
+        <PageHeader>Novo dependente de {funcionario.nome}</PageHeader>
         <Button asChild variant="ghost">
           <Link href="./">
             <ArrowLeftIcon className="mr-2 size-4" />
-            Voltar
+            Dependentes
           </Link>
         </Button>
       </div>
       <Separator />
       <section className="container">
-        <DependentesForm data={parsed.data} nome_dependente={idValido.data} />
+        <DependentesForm matricula={matriculaValida.data} />
       </section>
     </PageContainer>
   );

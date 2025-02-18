@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { schemas } from "@/schemas";
 import { db } from "@/server/database";
 import { Permission } from "@/server/services/permission";
-import { formatData } from "@/server/utils/formaters";
+import { formatData } from "@/utils/formaters";
 import { ArrowLeftIcon } from "lucide-react";
 import { type Metadata } from "next";
 import Link from "next/link";

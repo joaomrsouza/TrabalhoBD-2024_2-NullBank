@@ -19,7 +19,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
 
 import { fns } from "@/lib/date-fns";
-import { type ObjectSearch } from "@/server/api/routers/search";
+import { type ObjectSearch } from "@/utils/enums";
 import { isDateRange } from "react-day-picker";
 import { useDebounce } from "./use-debounce";
 
@@ -30,16 +30,12 @@ export interface Option {
   withCount?: boolean;
 }
 
-export interface DataTableFilterField<
-  TData,
-  WhereRestriction = Record<string, unknown>,
-> {
+export interface DataTableFilterField<TData> {
   dateRangeLimit?: number;
   label: string;
   options?: Option[];
   placeholder?: string;
   searchQueryObject?: ObjectSearch;
-  searchQueryRestriction?: WhereRestriction;
   type: "date" | "select" | "text";
   value: keyof TData;
 }
@@ -54,17 +50,13 @@ export interface DataTableFilterOption<TData> {
   value: keyof TData;
 }
 
-interface UseDataTableProps<
-  TData,
-  TValue,
-  WhereRestriction = Record<string, unknown>,
-> {
+interface UseDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   defaultPerPage?: number;
   defaultSort?: `${Extract<keyof TData, number | string>}.${"asc" | "desc"}`;
   enableAdvancedFilter?: boolean;
-  filterFields?: DataTableFilterField<TData, WhereRestriction>[];
+  filterFields?: DataTableFilterField<TData>[];
   pageCount: number;
 }
 
@@ -74,11 +66,7 @@ const schema = z.object({
   sort: z.string().optional(),
 });
 
-export function useDataTable<
-  TData,
-  TValue,
-  WhereRestriction = Record<string, unknown>,
->({
+export function useDataTable<TData, TValue>({
   columns,
   data,
   defaultPerPage = 10,
@@ -86,7 +74,7 @@ export function useDataTable<
   enableAdvancedFilter = false,
   filterFields = [],
   pageCount,
-}: UseDataTableProps<TData, TValue, WhereRestriction>) {
+}: UseDataTableProps<TData, TValue>) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

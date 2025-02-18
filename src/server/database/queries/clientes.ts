@@ -41,6 +41,7 @@ export async function getFilteredPage(params: FilteredPageParams): Promise<{
         (nome LIKE CONCAT('%', ${nome ?? ""}, '%') OR ${searchNome} = 1)
         AND
         (cpf LIKE CONCAT('%', ${cpf ?? ""}, '%') OR ${searchCPF} = 1)
+      ORDER BY nome ASC
       LIMIT ${String(skip)}, ${String(take)}
     `,
 

@@ -1,5 +1,5 @@
-import { type ObjectSearch } from "@/server/api/routers/search";
 import { api } from "@/trpc/react";
+import { type ObjectSearch } from "@/utils/enums";
 import React, { useMemo } from "react";
 import { useDebounce } from "./use-debounce";
 
@@ -18,10 +18,7 @@ type UseSearchQueryReturn = {
   };
 };
 
-export function useSearchQuery<WhereRestriction = Record<string, unknown>>(
-  object?: ObjectSearch,
-  whereRestriction?: WhereRestriction, // TODO: Remover isso e fazer rotas especializadas
-): UseSearchQueryReturn {
+export function useSearchQuery(object?: ObjectSearch): UseSearchQueryReturn {
   const [searchText, handleSearchText] = React.useState("");
   const search = useDebounce(searchText, 250);
 

@@ -9,7 +9,7 @@ export const funcionariosRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       if (!input.matricula) {
         const data = schemas.funcionario.create.parse(input);
-        return await db.queries.funcionarios.insert(data); // TODO: Ajustar obrigatoriedade da senha
+        return await db.queries.funcionarios.insert(data);
       }
 
       const data = schemas.funcionario.update.parse(omit(input, ["matricula"]));

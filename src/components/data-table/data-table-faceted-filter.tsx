@@ -23,33 +23,23 @@ import { Separator } from "@/components/ui/separator";
 import { useSearchQuery } from "@/hooks";
 import { type Option } from "@/hooks/use-data-table";
 import { cn } from "@/lib/utils";
-import { type ObjectSearch } from "@/server/api/routers/search";
+import { type ObjectSearch } from "@/utils/enums";
 import { CommandLoading } from "cmdk";
 import React from "react";
 
-interface DataTableFacetedFilterProps<
-  TData,
-  TValue,
-  WhereRestriction = Record<string, unknown>,
-> {
+interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>;
   options?: Option[];
   searchQueryObject?: ObjectSearch;
-  searchQueryRestriction?: WhereRestriction;
   title?: string;
 }
 
-export function DataTableFacetedFilter<
-  TData,
-  TValue,
-  WhereRestriction = Record<string, unknown>,
->({
+export function DataTableFacetedFilter<TData, TValue>({
   column,
   options: fixedOptions,
   searchQueryObject,
-  searchQueryRestriction,
   title,
-}: DataTableFacetedFilterProps<TData, TValue, WhereRestriction>) {
+}: DataTableFacetedFilterProps<TData, TValue>) {
   const selectedValues = new Set(column?.getFilterValue() as string[]);
 
   const [optionsCache, setOptionsCache] = React.useState<Map<string, Option>>(
@@ -61,7 +51,7 @@ export function DataTableFacetedFilter<
     onSearchChange,
     options: queryOptions,
     search,
-  } = useSearchQuery(searchQueryObject, searchQueryRestriction).selectProps;
+  } = useSearchQuery(searchQueryObject).selectProps;
 
   const options = React.useMemo(
     () => fixedOptions ?? queryOptions,

@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { schemas } from "@/schemas";
 import { db } from "@/server/database";
 import { Permission } from "@/server/services/permission";
-import { formatData } from "@/server/utils/formaters";
+import { formatData } from "@/utils/formaters";
 import { ArrowLeftIcon } from "lucide-react";
 import { type Metadata } from "next";
 import Link from "next/link";
@@ -16,19 +16,19 @@ import { notFound } from "next/navigation";
 import { ShowFuncionarioActions } from "./_components/show-funcionarios-actions";
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ matricula: string }>;
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-  const { id } = await props.params;
+  const { matricula } = await props.params;
 
   const notFound = { title: "Funcionário não encontrado" };
 
-  const idValido = schemas.id.safeParse(id);
-  if (!idValido.success) return notFound;
+  const matriculaValida = schemas.number.safeParse(matricula);
+  if (!matriculaValida.success) return notFound;
 
   const funcionario = await db.queries.funcionarios.getNomeByMatricula(
-    idValido.data,
+    matriculaValida.data,
   );
 
   if (!funcionario) return notFound;
@@ -37,15 +37,15 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 }
 
 export default async function ExibirFuncionario(props: PageProps) {
-  const { id } = await props.params;
+  const { matricula } = await props.params;
 
   const user = await Permission.safeGetAuthUser(["dba"]);
 
-  const idValido = schemas.id.safeParse(id);
-  if (!idValido.success) return notFound();
+  const matriculaValida = schemas.number.safeParse(matricula);
+  if (!matriculaValida.success) return notFound();
 
   const funcionario = await db.queries.funcionarios.getByMatricula(
-    idValido.data,
+    matriculaValida.data,
   );
 
   if (!funcionario) return notFound();
@@ -70,8 +70,8 @@ export default async function ExibirFuncionario(props: PageProps) {
 
       <ShowFuncionarioActions
         canEdit={canEdit}
-        id={idValido.data}
         canDelete={canDelete}
+        matricula={matriculaValida.data}
       />
       <ShowSection title="Cadastro">
         <ShowGroup>
@@ -98,8 +98,8 @@ export default async function ExibirFuncionario(props: PageProps) {
       </ShowSection>
       <ShowFuncionarioActions
         canEdit={canEdit}
-        id={idValido.data}
         canDelete={canDelete}
+        matricula={matriculaValida.data}
       />
     </PageContainer>
   );

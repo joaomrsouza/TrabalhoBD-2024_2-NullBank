@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useDataTable } from "@/hooks";
 import { type DataTableFilterField } from "@/hooks/use-data-table";
 import { type Dependente } from "@/server/database/queries/dependentes";
-import { formatData } from "@/server/utils/formaters";
+import { formatData } from "@/utils/formaters";
 import { type ColumnDef } from "@tanstack/react-table";
 import { TextSearchIcon } from "lucide-react";
 import Link from "next/link";
@@ -30,7 +30,7 @@ export function DependenteTable(props: DependenteTableProps) {
     columns,
     data,
     defaultPerPage: 10,
-    defaultSort: "nome.asc",
+    defaultSort: "nome_dependente.asc",
     filterFields: filters,
     pageCount,
   });
@@ -75,16 +75,6 @@ function getColumns(): ColumnDef<TableData>[] {
       ),
     },
     {
-      accessorKey: "funcionarios_matricula",
-      enableSorting: false,
-      header: ({ column }) => (
-        <DataTableColumnHeader
-          column={column}
-          title="Funcionário Responsável"
-        />
-      ),
-    },
-    {
       accessorKey: "data_nasc",
       cell: ({ getValue }) => formatData(getValue<Date>()),
       enableSorting: false,
@@ -112,16 +102,10 @@ function getColumns(): ColumnDef<TableData>[] {
 function getFilters(): DataTableFilterField<TableData>[] {
   return [
     {
-      label: "Funcionário Responsável",
-      placeholder: "Filtrar Funcionário Responsável...",
-      type: "text",
-      value: "funcionarios_matricula",
-    },
-    {
       label: "Nome",
       placeholder: "Filtrar nome...",
       type: "text",
-      value: "nome",
+      value: "nome_dependente",
     },
   ];
 }

@@ -1,12 +1,12 @@
 import { env } from "@/env";
 import { schemas } from "@/schemas";
+import { Cargos } from "@/utils/enums";
 import { omit } from "lodash";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { db } from "../database";
 import { type Agencia } from "../database/queries/agencias";
 import { type Conta } from "../database/queries/contas";
-import { Cargos } from "../database/queries/funcionarios";
 import { AuthService } from "../services/auth";
 
 export const CargosUser = [...Cargos, "dba", "cliente"] as const;

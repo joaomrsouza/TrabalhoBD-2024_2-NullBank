@@ -1,5 +1,5 @@
 import { z } from "@/lib/zod";
-import { addQueryParams } from "@/server/utils/schemas";
+import { addQueryParams } from "@/utils/schemas";
 
 export const form = z.object({
   cidade_ag: z.string().trim().min(1, "Cidade da agência é obrigatória"),

@@ -1,8 +1,7 @@
 import { z } from "@/lib/zod";
+import { db } from "@/server/database";
+import { type ObjectSearch, ObjectsSearch } from "@/utils/enums";
 import { accessProcedure, createTRPCRouter } from "../trpc";
-
-export const ObjectsSearch = ["agencia", "funcionario"] as const;
-export type ObjectSearch = (typeof ObjectsSearch)[number];
 
 export const searchRouter = createTRPCRouter({
   object: accessProcedure(["dba"])
@@ -13,12 +12,26 @@ export const searchRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input }) => {
-      // TODO: fazer a query devida
-      return [
-        {
-          label: "Label teste",
-          value: "Valor teste",
+      const resolvers: Record<
+        ObjectSearch,
+        () => Promise<Array<{ label: string; value: string }>>
+      > = {
+        agencia: async () =>
+          (await db.queries.agencias.list(input.search)).map(a => ({
+            label: a.nome_ag,
+            value: a.num_ag.toString(),
+          })),
+        funcionario: async () => {
+          // TODO: Colocar query aqui
+          return [
+            {
+              label: "Funcionário teste",
+              value: "Valor teste",
+            },
+          ];
         },
-      ];
+      };
+
+      return await resolvers[input.object]();
     }),
 });

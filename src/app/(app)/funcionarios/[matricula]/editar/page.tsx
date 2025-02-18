@@ -12,19 +12,19 @@ import { notFound } from "next/navigation";
 import { FuncionariosForm } from "../../_components/funcionarios-form";
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ matricula: string }>;
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-  const { id } = await props.params;
+  const { matricula } = await props.params;
 
   const notFound = { title: "Funcionário não encontrado" };
 
-  const idValido = schemas.id.safeParse(id);
-  if (!idValido.success) return notFound;
+  const matriculaValida = schemas.number.safeParse(matricula);
+  if (!matriculaValida.success) return notFound;
 
   const funcionario = await db.queries.funcionarios.getNomeByMatricula(
-    idValido.data,
+    matriculaValida.data,
   );
 
   if (!funcionario) return notFound;
@@ -33,15 +33,15 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 }
 
 export default async function EditarFuncionario(props: PageProps) {
-  const { id } = await props.params;
+  const { matricula } = await props.params;
 
   await Permission.safeGetAuthUser(["dba"]);
 
-  const idValido = schemas.id.safeParse(id);
-  if (!idValido.success) return notFound();
+  const matriculaValida = schemas.number.safeParse(matricula);
+  if (!matriculaValida.success) return notFound();
 
   const funcionario = await db.queries.funcionarios.getByMatricula(
-    idValido.data,
+    matriculaValida.data,
   );
   const parsed = schemas.funcionario.prune.safeParse(funcionario);
 
@@ -60,7 +60,7 @@ export default async function EditarFuncionario(props: PageProps) {
       </div>
       <Separator />
       <section className="container">
-        <FuncionariosForm data={parsed.data} matricula={idValido.data} />
+        <FuncionariosForm data={parsed.data} matricula={matriculaValida.data} />
       </section>
     </PageContainer>
   );

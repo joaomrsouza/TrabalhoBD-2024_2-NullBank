@@ -6,19 +6,20 @@ import { api } from "@/trpc/react";
 interface ShowDependenteActionsProps {
   canDelete: boolean;
   canEdit: boolean;
-  id: string;
+  matricula: number;
+  nome: string;
 }
 
 export function ShowDependenteActions(props: ShowDependenteActionsProps) {
-  const { canDelete, canEdit, id } = props;
+  const { canDelete, canEdit, matricula, nome } = props;
 
   return (
     <ShowActions
-      registryId={id}
+      registryId={nome}
       canEdit={canEdit}
       canDelete={canDelete}
-      deleteParams={{ nome_dependente: id }}
       deleteMutationCall={api.dependentes.delete}
+      deleteParams={{ matricula, nome_dependente: nome }}
     />
   );
 }

@@ -1,7 +1,5 @@
+import { type TipoConta } from "@/utils/enums";
 import { db } from "..";
-
-export const TiposConta = ["especial", "corrente", "poupança"] as const;
-export type TipoConta = (typeof TiposConta)[number];
 
 export type Conta = {
   agencias_num_ag: number;

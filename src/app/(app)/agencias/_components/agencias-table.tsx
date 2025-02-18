@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useDataTable } from "@/hooks";
 import { type DataTableFilterField } from "@/hooks/use-data-table";
 import { type Agencia } from "@/server/database/queries/agencias";
-import { formatCurrency } from "@/server/utils/formaters";
+import { formatCurrency } from "@/utils/formaters";
 import { type ColumnDef } from "@tanstack/react-table";
 import { TextSearchIcon } from "lucide-react";
 import Link from "next/link";
@@ -49,7 +49,6 @@ function getColumns(): ColumnDef<TableData>[] {
       cell: ({ row }) => (
         <Button
           asChild
-          // size="icon"
           size="sm"
           title="Visualizar registro"
           aria-label="Visualizar registro"

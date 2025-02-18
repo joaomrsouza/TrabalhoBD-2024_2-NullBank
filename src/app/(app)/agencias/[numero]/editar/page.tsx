@@ -12,18 +12,18 @@ import { notFound } from "next/navigation";
 import { AgenciasForm } from "../../_components/agencias-form";
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ numero: string }>;
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-  const { id } = await props.params;
+  const { numero } = await props.params;
 
   const notFound = { title: "Agência não encontrada" };
 
-  const idValido = schemas.id.safeParse(id);
-  if (!idValido.success) return notFound;
+  const numeroValido = schemas.number.safeParse(numero);
+  if (!numeroValido.success) return notFound;
 
-  const agencia = await db.queries.agencias.getNomeByNumero(idValido.data);
+  const agencia = await db.queries.agencias.getNomeByNumero(numeroValido.data);
 
   if (!agencia) return notFound;
 
@@ -31,14 +31,14 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 }
 
 export default async function EditarAgencia(props: PageProps) {
-  const { id } = await props.params;
+  const { numero } = await props.params;
 
   await Permission.safeGetAuthUser(["dba"]);
 
-  const idValido = schemas.id.safeParse(id);
-  if (!idValido.success) return notFound();
+  const numeroValido = schemas.number.safeParse(numero);
+  if (!numeroValido.success) return notFound();
 
-  const agencia = await db.queries.agencias.getByNumero(idValido.data);
+  const agencia = await db.queries.agencias.getByNumero(numeroValido.data);
   const parsed = schemas.agencia.prune.safeParse(agencia);
 
   if (!parsed.success) notFound();
@@ -56,7 +56,7 @@ export default async function EditarAgencia(props: PageProps) {
       </div>
       <Separator />
       <section className="container">
-        <AgenciasForm data={parsed.data} num_ag={idValido.data} />
+        <AgenciasForm data={parsed.data} num_ag={numeroValido.data} />
       </section>
     </PageContainer>
   );

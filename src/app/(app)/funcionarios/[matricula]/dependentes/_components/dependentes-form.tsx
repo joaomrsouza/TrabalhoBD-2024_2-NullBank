@@ -8,8 +8,8 @@ import { FormSelect } from "@/components/form/form-select";
 import { useHandleSubmitMutation } from "@/hooks";
 import { type z } from "@/lib/zod";
 import { schemas } from "@/schemas";
-import { Parentescos } from "@/server/database/queries/dependentes";
 import { api } from "@/trpc/react";
+import { Parentescos } from "@/utils/enums";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { capitalize } from "lodash";
 import { useForm } from "react-hook-form";
@@ -19,62 +19,54 @@ type FormData = z.infer<typeof schemas.dependente.form>;
 
 interface DependentesFormProps {
   data?: Partial<FormData>;
+  matricula: number;
   nome_dependente?: string;
 }
 
 export function DependentesForm(props: DependentesFormProps) {
-  const { data, nome_dependente } = props;
+  const { data, matricula, nome_dependente } = props;
 
   const editando = nome_dependente !== undefined;
 
   const form = useForm<FormData>({
     defaultValues: {
       data_nasc: "",
-      funcionarios_matricula: "",
-      nome_dependente: "",
-      parentesco: "",
       ...data,
+      create: !editando,
+      matricula,
+      nome_dependente: editando ? nome_dependente : "",
     },
     resolver: zodResolver(schemas.dependente.form),
   });
 
   const { handleSubmit } = useHandleSubmitMutation({
     form,
-    mutationCall: api.dependentes.upsert, // TODO: Ajeitar esse upsert
+    mutationCall: api.dependentes.upsert,
     async onSuccess(data, router) {
       toast.success(
         `Dependente ${data?.nome_dependente} ${editando ? "atualizado" : "criado"} com sucesso!`,
       );
-      // TODO: invalidade search query
-      // await getQueryClient().invalidateQueries({
-      //   queryKey: ["/api/auth/temPermissao"],
-      // });
-      router.push(`/dependentes${editando ? "/" + nome_dependente : ""}`);
+      router.push(editando ? "./" : "./" + data?.nome_dependente);
     },
   });
 
   return (
     <FormContainer form={form} handleSubmit={handleSubmit}>
-      <FormGroup>
+      {!editando && (
         <FormInput<FormData>
           required
           maxLength={80}
           name="nome_dependente"
           label="Nome Dependente"
         />
+      )}
+
+      <FormGroup>
         <FormInput<FormData>
           required
           type="date"
           name="data_nasc"
           label="Data Nascimento"
-        />
-      </FormGroup>
-
-      <FormGroup>
-        <FormInput<FormData>
-          required
-          name="funcionarios_matricula"
-          label="Funcionário Responsável"
         />
         <FormSelect<FormData>
           required

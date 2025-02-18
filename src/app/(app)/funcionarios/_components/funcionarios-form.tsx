@@ -5,11 +5,11 @@ import { FormContainer } from "@/components/form/form-container";
 import { FormGroup } from "@/components/form/form-group";
 import { FormInput } from "@/components/form/form-input";
 import { FormSelect } from "@/components/form/form-select";
-import { useHandleSubmitMutation } from "@/hooks";
-import { type z } from "@/lib/zod";
+import { useHandleSubmitMutation, useSearchQuery } from "@/hooks";
+import { z } from "@/lib/zod";
 import { schemas } from "@/schemas";
-import { Cargos, Generos } from "@/server/database/queries/funcionarios";
 import { api } from "@/trpc/react";
+import { Cargos, Generos } from "@/utils/enums";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { capitalize } from "lodash";
 import { useForm } from "react-hook-form";
@@ -29,7 +29,6 @@ export function FuncionariosForm(props: FuncionariosFormProps) {
 
   const form = useForm<FormData>({
     defaultValues: {
-      agencias_num_ag: 0,
       cidade: "",
       data_nasc: "",
       endereco: "",
@@ -37,21 +36,24 @@ export function FuncionariosForm(props: FuncionariosFormProps) {
       salario: 0,
       senha: "",
       ...data,
+      matricula,
     },
-    resolver: zodResolver(schemas.funcionario.form),
+    resolver: zodResolver(
+      editando
+        ? schemas.funcionario.form
+        : schemas.funcionario.form.extend({
+            senha: z.string().trim().min(1, "Senha é obrigatória"),
+          }),
+    ),
   });
 
   const { handleSubmit } = useHandleSubmitMutation({
     form,
-    mutationCall: api.funcionarios.upsert, // TODO: Ajeitar esse upsert
+    mutationCall: api.funcionarios.upsert,
     async onSuccess(data, router) {
       toast.success(
         `Funcionário ${data?.matricula} ${editando ? "atualizado" : "criado"} com sucesso!`,
       );
-      // TODO: invalidade search query
-      // await getQueryClient().invalidateQueries({
-      //   queryKey: ["/api/auth/temPermissao"],
-      // });
       router.push(`/funcionarios${editando ? "/" + matricula : ""}`);
     },
   });
@@ -78,10 +80,11 @@ export function FuncionariosForm(props: FuncionariosFormProps) {
       </FormGroup>
 
       <FormGroup>
-        <FormInput<FormData>
+        <FormSelect<FormData>
           required
+          label="Agência"
           name="agencias_num_ag"
-          label="Número da Agência"
+          {...useSearchQuery("agencia").selectProps}
         />
         <FormSelect<FormData>
           required
@@ -117,6 +120,12 @@ export function FuncionariosForm(props: FuncionariosFormProps) {
         />
       </FormGroup>
 
+      <FormInput<FormData>
+        name="senha"
+        label="Senha"
+        type="password"
+        required={!editando}
+      />
       <FormActions />
     </FormContainer>
   );

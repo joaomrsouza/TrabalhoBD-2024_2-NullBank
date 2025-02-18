@@ -8,8 +8,8 @@ import { FormSelect } from "@/components/form/form-select";
 import { useHandleSubmitMutation, useInputMask } from "@/hooks";
 import { type z } from "@/lib/zod";
 import { schemas } from "@/schemas";
-import { ufs } from "@/server/utils/enums";
 import { api } from "@/trpc/react";
+import { ufs } from "@/utils/enums";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -28,8 +28,6 @@ export function ClientesForm(props: ClientesFormProps) {
 
   const form = useForm<FormData>({
     defaultValues: {
-      cpf: editando ? cpf : "",
-      create: !editando,
       data_nasc: "",
       end_bairro: "",
       end_cep: "",
@@ -43,6 +41,8 @@ export function ClientesForm(props: ClientesFormProps) {
       rg_orgao_emissor: "",
       rg_uf: "",
       ...data,
+      cpf: editando ? cpf : "",
+      create: !editando,
     },
     resolver: zodResolver(schemas.cliente.form),
   });

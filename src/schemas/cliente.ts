@@ -1,5 +1,5 @@
 import { z } from "@/lib/zod";
-import { addQueryParams } from "@/server/utils/schemas";
+import { addQueryParams } from "@/utils/schemas";
 
 export const form = z.object({
   cpf: z.string().trim().length(11, "CPF deve conter 11 caracteres").optional(),

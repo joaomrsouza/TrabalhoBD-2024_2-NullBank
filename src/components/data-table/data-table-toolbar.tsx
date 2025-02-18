@@ -81,7 +81,6 @@ export function DataTableToolbar<TData>({
                   options={column.options}
                   key={String(column.value)}
                   searchQueryObject={column.searchQueryObject}
-                  searchQueryRestriction={column.searchQueryRestriction}
                   column={table.getColumn(
                     column.value ? String(column.value) : "",
                   )}

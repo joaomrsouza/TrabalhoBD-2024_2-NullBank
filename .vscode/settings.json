@@ -15,7 +15,6 @@
     "ms-vsliveshare.vsliveshare",
     "marcbruederlin.next-icons"
   ],
-  "workbench.iconTheme": "next-icons-light",
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
@@ -23,5 +22,5 @@
     "source.fixAll.tslint": "explicit",
     "source.organizeImports": "explicit",
     "source.sortImports": "explicit"
-  },
+  }
 }
