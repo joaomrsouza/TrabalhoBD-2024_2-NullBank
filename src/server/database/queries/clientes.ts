@@ -19,9 +19,21 @@ export type Cliente = {
   rg_uf: string;
 };
 
-export type ClienteUpsert = {
+export type Email = {
+  email: string;
+  tipo: string;
+};
+
+export type Telefone = {
+  telefone: string;
+  tipo: string;
+};
+
+export type ClienteUpsert = Omit<Cliente, "data_nasc"> & {
   data_nasc: string;
-} & Omit<Cliente, "data_nasc">;
+  emails: Array<Email>;
+  telefones: Array<Telefone>;
+};
 
 type FilteredPageParams = z.infer<typeof schemas.cliente.searchParams>;
 
@@ -84,6 +96,25 @@ export async function insert(data: ClienteUpsert) {
       (${data.cpf}, ${data.nome}, ${data.data_nasc}, ${data.rg_num}, ${data.rg_orgao_emissor}, ${data.rg_uf}, ${data.end_tipo}, ${data.end_logradouro}, ${data.end_numero}, ${data.end_bairro}, ${data.end_cep}, ${data.end_cidade}, ${data.end_estado})
   `;
 
+  await Promise.all([
+    ...data.emails.map(
+      ({ email, tipo }) => db.sql<OpResponse>`
+        INSERT INTO emails
+          (clientes_cpf, email, tipo)
+        VALUES
+          (${data.cpf}, ${email}, ${tipo})
+      `,
+    ),
+    ...data.telefones.map(
+      ({ telefone, tipo }) => db.sql<OpResponse>`
+        INSERT INTO telefones
+          (clientes_cpf, telefone, tipo)
+        VALUES
+          (${data.cpf}, ${telefone}, ${tipo})
+      `,
+    ),
+  ]);
+
   const newCliente = await db.sql<Array<Cliente>>`
     SELECT * FROM clientes WHERE cpf = ${result.insertId}
   `;
@@ -112,6 +143,34 @@ export async function updateByCPF(
     WHERE cpf = ${cpf}
   `;
 
+  await Promise.all([
+    db.sql<OpResponse>`
+      DELETE FROM emails WHERE clientes_cpf = ${cpf}
+    `,
+    db.sql<OpResponse>`
+      DELETE FROM telefones WHERE clientes_cpf = ${cpf}
+    `,
+  ]);
+
+  await Promise.all([
+    ...data.emails.map(
+      ({ email, tipo }) => db.sql<OpResponse>`
+        INSERT INTO emails
+          (clientes_cpf, email, tipo)
+        VALUES
+          (${cpf}, ${email}, ${tipo})
+      `,
+    ),
+    ...data.telefones.map(
+      ({ telefone, tipo }) => db.sql<OpResponse>`
+        INSERT INTO telefones
+          (clientes_cpf, telefone, tipo)
+        VALUES
+          (${cpf}, ${telefone}, ${tipo})
+      `,
+    ),
+  ]);
+
   const updatedCliente = await db.sql<Array<Cliente>>`
     SELECT * FROM clientes WHERE cpf = ${cpf}
   `;
@@ -120,8 +179,29 @@ export async function updateByCPF(
 }
 
 export async function deleteByCPF(cpf: string) {
+  await Promise.all([
+    db.sql<OpResponse>`
+      DELETE FROM emails WHERE clientes_cpf = ${cpf}
+    `,
+    db.sql<OpResponse>`
+      DELETE FROM telefones WHERE clientes_cpf = ${cpf}
+    `,
+  ]);
+
   await db.sql`
     DELETE FROM clientes
     WHERE cpf = ${cpf}
+  `;
+}
+
+export async function getEmailsByCPF(cpf: string) {
+  return await db.sql<Array<Email>>`
+    SELECT email, tipo FROM emails WHERE clientes_cpf = ${cpf}
+  `;
+}
+
+export async function getTelefonesByCPF(cpf: string) {
+  return await db.sql<Array<Telefone>>`
+    SELECT telefone, tipo FROM telefones WHERE clientes_cpf = ${cpf}
   `;
 }

@@ -38,8 +38,16 @@ export default async function EditarCliente(props: PageProps) {
   const idValido = schemas.string.safeParse(id);
   if (!idValido.success) return notFound();
 
-  const cliente = await db.queries.clientes.getByCpf(idValido.data);
-  const parsed = schemas.cliente.prune.safeParse(cliente);
+  const [cliente, emails, telefones] = await Promise.all([
+    db.queries.clientes.getByCpf(idValido.data),
+    db.queries.clientes.getEmailsByCPF(idValido.data),
+    db.queries.clientes.getTelefonesByCPF(idValido.data),
+  ]);
+  const parsed = schemas.cliente.prune.safeParse({
+    ...cliente,
+    emails,
+    telefones,
+  });
 
   if (!parsed.success) notFound();
 

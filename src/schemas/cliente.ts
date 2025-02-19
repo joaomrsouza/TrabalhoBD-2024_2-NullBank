@@ -32,6 +32,27 @@ export const form = z.object({
     .string()
     .trim()
     .length(2, "A UF do RG deve ser um código de estado (Ex: 'CE', SP)"),
+
+  emails: z.array(
+    z.object({
+      email: z.string().email(),
+
+      tipo: z.string().trim(),
+    }),
+  ),
+
+  telefones: z.array(
+    z.object({
+      telefone: z
+        .string()
+        .regex(
+          /\(\d{2}\) \d{5}\-\d{4}/,
+          "O telefone deve estar no formato (00) 00000-0000.",
+        ),
+
+      tipo: z.string().trim(),
+    }),
+  ),
 });
 
 export const create = form
@@ -51,6 +72,10 @@ export const prune = nonStrictUpdate
   .transform(data => ({
     ...data,
     data_nasc: data.data_nasc.toISOString().split("T")[0],
+    emails: data.emails.length ? data.emails : [{ email: "", tipo: "" }],
+    telefones: data.telefones.length
+      ? data.telefones
+      : [{ telefone: "", tipo: "" }],
   }));
 
 export const remove = z.object({ cpf: z.string() });

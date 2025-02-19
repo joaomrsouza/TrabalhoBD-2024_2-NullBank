@@ -4,6 +4,7 @@ import { FormActions } from "@/components/form/form-actions";
 import { FormContainer } from "@/components/form/form-container";
 import { FormGroup } from "@/components/form/form-group";
 import { FormInput } from "@/components/form/form-input";
+import { FormInputArray } from "@/components/form/form-input-array";
 import { FormSelect } from "@/components/form/form-select";
 import { useHandleSubmitMutation, useInputMask } from "@/hooks";
 import { type z } from "@/lib/zod";
@@ -29,6 +30,7 @@ export function ClientesForm(props: ClientesFormProps) {
   const form = useForm<FormData>({
     defaultValues: {
       data_nasc: "",
+      emails: [{ email: "", tipo: "" }],
       end_bairro: "",
       end_cep: "",
       end_cidade: "",
@@ -40,6 +42,7 @@ export function ClientesForm(props: ClientesFormProps) {
       rg_num: "",
       rg_orgao_emissor: "",
       rg_uf: "",
+      telefones: [{ telefone: "", tipo: "" }],
       ...data,
       cpf: editando ? cpf : "",
       create: !editando,
@@ -109,6 +112,8 @@ export function ClientesForm(props: ClientesFormProps) {
         />
       </FormGroup>
 
+      <h2 className="text-lg font-bold">Endereço</h2>
+
       <FormGroup>
         <FormInput<FormData>
           required
@@ -156,6 +161,50 @@ export function ClientesForm(props: ClientesFormProps) {
           label="CEP (Somente Números)"
         />
       </FormGroup>
+
+      <h2 className="text-lg font-bold">E-mails</h2>
+
+      <FormInputArray<FormData>
+        name="emails"
+        defaultValue={{ email: "", tipo: "" }}
+        render={index => (
+          <FormGroup>
+            <FormInput<FormData>
+              maxLength={80}
+              name={`emails.${index}.tipo`}
+              label={`Tipo de E-mail ${index + 1}`}
+            />
+            <FormInput<FormData>
+              type="email"
+              maxLength={254}
+              label={`E-mail ${index + 1}`}
+              name={`emails.${index}.email`}
+            />
+          </FormGroup>
+        )}
+      />
+
+      <h2 className="text-lg font-bold">Telefones</h2>
+
+      <FormInputArray<FormData>
+        name="telefones"
+        defaultValue={{ telefone: "", tipo: "" }}
+        render={index => (
+          <FormGroup>
+            <FormInput<FormData>
+              maxLength={80}
+              name={`telefones.${index}.tipo`}
+              label={`Tipo de Telefone ${index + 1}`}
+            />
+            <FormInput<FormData>
+              type="tel"
+              maxLength={15}
+              label={`Telefone ${index + 1}`}
+              name={`telefones.${index}.telefone`}
+            />
+          </FormGroup>
+        )}
+      />
 
       <FormActions />
     </FormContainer>

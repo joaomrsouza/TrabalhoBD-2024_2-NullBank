@@ -46,6 +46,11 @@ export default async function ExibirCliente(props: PageProps) {
 
   if (!cliente) return notFound();
 
+  const [emails, telefones] = await Promise.all([
+    db.queries.clientes.getEmailsByCPF(idValido.data),
+    db.queries.clientes.getTelefonesByCPF(idValido.data),
+  ]);
+
   const canEdit = Permission.temPermissaoDeAcesso(["dba"], user);
   const canDelete = Permission.temPermissaoDeAcesso(["dba"], user);
 
@@ -85,7 +90,9 @@ export default async function ExibirCliente(props: PageProps) {
           </ShowField>
           <ShowField label="UF">{cliente.rg_uf}</ShowField>
         </ShowGroup>
+      </ShowSection>
 
+      <ShowSection title="Endereço">
         <ShowGroup>
           <ShowField label="Tipo de Endereço">{cliente.end_tipo}</ShowField>
           <ShowField label="Logradouro">{cliente.end_logradouro}</ShowField>
@@ -99,6 +106,27 @@ export default async function ExibirCliente(props: PageProps) {
           <ShowField label="CEP">{cliente.end_cep}</ShowField>
         </ShowGroup>
       </ShowSection>
+
+      <ShowSection title="E-mails">
+        {emails.map(({ email, tipo }, index) => (
+          <ShowGroup key={email}>
+            <ShowField label={`Tipo de E-mail ${index + 1}`}>{tipo}</ShowField>
+            <ShowField label={`E-mail ${index + 1}`}>{email}</ShowField>
+          </ShowGroup>
+        ))}
+      </ShowSection>
+
+      <ShowSection title="Telefones">
+        {telefones.map(({ telefone, tipo }, index) => (
+          <ShowGroup key={telefone}>
+            <ShowField label={`Tipo de Telefone ${index + 1}`}>
+              {tipo}
+            </ShowField>
+            <ShowField label={`Telefone ${index + 1}`}>{telefone}</ShowField>
+          </ShowGroup>
+        ))}
+      </ShowSection>
+
       <ShowClienteActions
         canEdit={canEdit}
         id={idValido.data}
