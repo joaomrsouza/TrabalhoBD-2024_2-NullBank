@@ -113,6 +113,86 @@ const menus: MenuItem[] = [
     tipo: "dropdown",
     titulo: "Funcionários",
   },
+  {
+    itens: [
+      {
+        cargo: ["dba"],
+        href: "/consultas/agencias/funcionarios",
+        tipo: "link",
+        titulo: "Funcionários por agência",
+      },
+      {
+        cargo: ["dba"],
+        href: "/consultas/agencias/clientes",
+        tipo: "link",
+        titulo: "Clientes por agência",
+      },
+      {
+        cargo: ["dba"],
+        href: "/consultas/agencias/contas-especiais",
+        tipo: "link",
+        titulo: "Contas especiais por agência",
+      },
+      {
+        cargo: ["dba"],
+        href: "/consultas/agencias/contas-poupanca",
+        tipo: "link",
+        titulo: "Contas poupança por agência",
+      },
+      {
+        cargo: ["dba"],
+        href: "/consultas/agencias/contas-corrente",
+        tipo: "link",
+        titulo: "Contas corrente por agência",
+      },
+      { tipo: "divisor" },
+      {
+        cargo: ["dba"],
+        href: "/consultas/clientes/contas",
+        tipo: "link",
+        titulo: "Contas por cliente",
+      },
+      {
+        cargo: ["dba"],
+        href: "/consultas/clientes/contas-conjunta",
+        tipo: "link",
+        titulo: "Contas conjunta por cliente",
+      },
+      {
+        cargo: ["dba"],
+        href: "/consultas/clientes/transacoes-volume",
+        tipo: "link",
+        titulo: "Volume de transações por cliente",
+      },
+      {
+        cargo: ["dba"],
+        href: "/consultas/clientes/transacoes-valor",
+        tipo: "link",
+        titulo: "Valor de transações por cliente",
+      },
+      { tipo: "divisor" },
+      {
+        cargo: ["dba"],
+        href: "/consultas/cidade/clientes",
+        tipo: "link",
+        titulo: "Clientes por cidade",
+      },
+      {
+        cargo: ["dba"],
+        href: "/consultas/cidade/funcionarios",
+        tipo: "link",
+        titulo: "Funcionários por cidade",
+      },
+      {
+        cargo: ["dba"],
+        href: "/consultas/cidade/agencias",
+        tipo: "link",
+        titulo: "Agências por cidade",
+      },
+    ],
+    tipo: "dropdown",
+    titulo: "Consultar",
+  },
 ];
 
 const rightMenus: MenuItem[] = [

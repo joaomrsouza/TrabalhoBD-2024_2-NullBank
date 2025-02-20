@@ -18,7 +18,7 @@ export const searchRouter = createTRPCRouter({
       > = {
         agencia: async () =>
           (await db.queries.agencias.list(input.search)).map(a => ({
-            label: a.nome_ag,
+            label: `${a.nome_ag} (${a.num_ag})`,
             value: a.num_ag.toString(),
           })),
         funcionario: async () => {

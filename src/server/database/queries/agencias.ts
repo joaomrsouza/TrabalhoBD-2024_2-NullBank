@@ -107,7 +107,11 @@ export async function list(search: string) {
   const result = await db.sql<Array<Pick<Agencia, "nome_ag" | "num_ag">>>`
     SELECT num_ag, nome_ag FROM agencias
     WHERE
-      (nome_ag LIKE CONCAT('%', ${search ?? ""}, '%') OR ${searchNome} = 1)
+      num_ag = ${search ?? ""}
+      OR
+      nome_ag LIKE CONCAT('%', ${search ?? ""}, '%')
+      OR
+      ${searchNome} = 1
   `;
 
   return result;
