@@ -3,6 +3,7 @@ import * as clientes from "./clientes";
 import * as contas from "./contas";
 import * as dependentes from "./dependentes";
 import * as funcionarios from "./funcionarios";
+import * as transacoes from "./transacoes";
 
 export type OpResponse = {
   affectedRows: number;
@@ -22,4 +23,5 @@ export const databaseQueries = {
   contas,
   dependentes,
   funcionarios,
+  transacoes,
 };
