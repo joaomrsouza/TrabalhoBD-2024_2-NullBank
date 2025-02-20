@@ -1,6 +1,7 @@
 import { z } from "@/lib/zod";
 import * as agencia from "./agencia";
 import * as cliente from "./cliente";
+import { consultas } from "./consultas";
 import * as conta from "./conta";
 import * as dependente from "./dependente";
 import * as funcionario from "./funcionario";
@@ -13,6 +14,7 @@ const string = z.string();
 export const schemas = {
   agencia,
   cliente,
+  consultas,
   conta,
   dependente,
   funcionario,
