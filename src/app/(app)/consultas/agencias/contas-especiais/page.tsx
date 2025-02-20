@@ -4,15 +4,15 @@ import { Separator } from "@/components/ui/separator";
 import { schemas } from "@/schemas";
 import { db } from "@/server/database";
 import { Permission } from "@/server/services/permission";
-import { AgenciaFuncionarioTable } from "./_components/agencia-funcionario-table";
+import { AgenciaContasEspeciaisTable } from "./_components/agencias-contas-especiais-table";
 
-export const metadata = { title: "Funcionários por agência" };
+export const metadata = { title: "Contas especiais por agência" };
 
 interface PageProps {
   searchParams: Promise<unknown>;
 }
 
-export default async function ConsultaAgenciaFuncionariosPage(
+export default async function ConsultaAgenciaContasEspeciaisPage(
   props: PageProps,
 ) {
   const searchParams = await props.searchParams;
@@ -22,15 +22,15 @@ export default async function ConsultaAgenciaFuncionariosPage(
   const search = schemas.consultas.agencias.agenciaParams.parse(searchParams);
 
   const { count, data } =
-    await db.queries.consultas.agencias.funcionarios(search);
+    await db.queries.consultas.agencias.contasEspeciais(search);
 
   const pageCount = Math.ceil(count / search.take);
 
   return (
     <PageContainer>
-      <PageHeader>Funcionários por agência</PageHeader>
+      <PageHeader>Contas especiais por agência</PageHeader>
       <Separator />
-      <AgenciaFuncionarioTable data={data} pageCount={pageCount} />
+      <AgenciaContasEspeciaisTable data={data} pageCount={pageCount} />
     </PageContainer>
   );
 }

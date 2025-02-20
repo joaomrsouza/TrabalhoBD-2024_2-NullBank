@@ -141,9 +141,15 @@ const menus: MenuItem[] = [
       },
       {
         cargo: ["dba"],
-        href: "/consultas/agencias/contas-corrente",
+        href: "/consultas/agencias/contas-corrente-transacoes-qtd",
         tipo: "link",
-        titulo: "Contas corrente por agência",
+        titulo: "Qtd. transações contas corrente por agência",
+      },
+      {
+        cargo: ["dba"],
+        href: "/consultas/agencias/contas-corrente-transacoes-valor",
+        tipo: "link",
+        titulo: "Valor transações contas corrente por agência",
       },
       { tipo: "divisor" },
       {
