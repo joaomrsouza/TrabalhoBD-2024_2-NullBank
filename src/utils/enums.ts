@@ -52,5 +52,10 @@ export const TiposTransacao = [
 ] as const;
 export type TipoTransacao = (typeof TiposTransacao)[number];
 
-export const ObjectsSearch = ["agencia", "gerente", "cliente"] as const;
+export const ObjectsSearch = [
+  "agencia",
+  "gerente",
+  "cliente",
+  "conta",
+] as const;
 export type ObjectSearch = (typeof ObjectsSearch)[number];

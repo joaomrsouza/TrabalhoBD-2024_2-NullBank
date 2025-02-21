@@ -1,11 +1,12 @@
 import { PageContainer } from "@/components/page-container";
 import { PageHeader } from "@/components/page-header";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { schemas } from "@/schemas";
 import { db } from "@/server/database";
 import { Permission } from "@/server/services/permission";
-import { ArrowLeftIcon } from "lucide-react";
+import { AlertCircleIcon, ArrowLeftIcon } from "lucide-react";
 import { type Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -54,7 +55,19 @@ export default async function EditarTransacao(props: PageProps) {
       </div>
       <Separator />
       <section className="container">
-        <TransacoesForm data={parsed.data} num_transacao={numTransacaoValida.data} />
+        <Alert variant="destructive">
+          <AlertCircleIcon className="size-4" />
+          <AlertTitle>Cuidado!</AlertTitle>
+          <AlertDescription>
+            Editar uma transação{" "}
+            <span className="font-bold">não alterará os valores em contas</span>
+            , apenas o registro da transação em si.
+          </AlertDescription>
+        </Alert>
+        <TransacoesForm
+          data={parsed.data}
+          num_transacao={numTransacaoValida.data}
+        />
       </section>
     </PageContainer>
   );

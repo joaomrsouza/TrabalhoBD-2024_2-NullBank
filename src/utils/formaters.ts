@@ -8,3 +8,7 @@ export function formatCurrency(value: number) {
 export function formatData(value: Date) {
   return value.toISOString().split("T")[0]?.split("-").reverse().join("/");
 }
+
+export function formatDataHora(value: Date) {
+  return value.toLocaleString().replace(/(\,|\ )/, " - ");
+}

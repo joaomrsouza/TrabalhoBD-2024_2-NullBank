@@ -99,6 +99,24 @@ const menus: MenuItem[] = [
     itens: [
       {
         cargo: ["dba"],
+        href: "/transacoes",
+        tipo: "link",
+        titulo: "Transações",
+      },
+      {
+        cargo: ["dba"],
+        href: "/transacoes/novo",
+        tipo: "link",
+        titulo: "Cadastrar transação",
+      },
+    ],
+    tipo: "dropdown",
+    titulo: "Transações",
+  },
+  {
+    itens: [
+      {
+        cargo: ["dba"],
         href: "/funcionarios",
         tipo: "link",
         titulo: "Funcionários",
@@ -197,7 +215,7 @@ const menus: MenuItem[] = [
       },
     ],
     tipo: "dropdown",
-    titulo: "Consultar",
+    titulo: "Consultas",
   },
 ];
 

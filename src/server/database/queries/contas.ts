@@ -237,3 +237,15 @@ export async function deleteByNumero(numero: number) {
     WHERE num_conta = ${numero}
   `;
 }
+
+export async function list(search: string) {
+  const searchNumero = Number(!search);
+
+  return db.sql<Array<Pick<Conta, "num_conta">>>`
+    SELECT num_conta FROM contas
+    WHERE
+      num_conta = ${search ?? ""}
+      OR
+      ${searchNumero} = 1
+  `;
+}

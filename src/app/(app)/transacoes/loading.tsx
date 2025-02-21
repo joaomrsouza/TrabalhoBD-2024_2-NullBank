@@ -11,7 +11,7 @@ export default function Loading() {
       <Separator />
       <div className="w-full space-y-2.5 overflow-auto">
         <DataTableToolbarLoading filtersNumber={2} />
-        <DataTableLoading rows={10} columns={10} />
+        <DataTableLoading rows={10} columns={7} />
       </div>
     </PageContainer>
   );

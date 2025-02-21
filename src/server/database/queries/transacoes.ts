@@ -32,7 +32,7 @@ export async function getFilteredPage(params: FilteredPageParams): Promise<{
       WHERE
         (num_transacao = ${num_transacao ?? ""} OR ${searchNumTransacao} = 1)
         AND
-        (tipo = ${tipo} OR ${searchTipo} = 1)
+        (tipo = ${tipo ?? ""} OR ${searchTipo} = 1)
       ORDER BY data_hora DESC
       LIMIT ${String(skip)}, ${String(take)}
     `,
@@ -42,7 +42,7 @@ export async function getFilteredPage(params: FilteredPageParams): Promise<{
       WHERE
         (num_transacao = ${num_transacao ?? ""} OR ${searchNumTransacao} = 1)
         AND
-        (tipo = ${tipo} OR ${searchTipo} = 1)
+        (tipo = ${tipo ?? ""} OR ${searchTipo} = 1)
     `,
   ]);
 
@@ -81,9 +81,10 @@ export async function updateByNumero(
 ) {
   await db.sql`
     UPDATE transacoes SET
+      contas_num_conta_origem = ${data.contas_num_conta_origem},
       contas_num_conta_destino = ${data.contas_num_conta_destino},
       tipo = ${data.tipo},
-      valor = ${data.valor},
+      valor = ${data.valor}
     WHERE num_transacao = ${numero}
   `;
 

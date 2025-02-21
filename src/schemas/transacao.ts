@@ -8,49 +8,42 @@ export const form = z.object({
     .trim()
     .min(1, "O número da conta de origem é obrigatório"),
 
-  contas_num_conta_destino: z.string().trim(),
+  contas_num_conta_destino: z.string().trim().nullable(),
 
-  valor: z
-    .string()
-    .trim()
-    .min(1, "O valor é obrigatório"),
+  valor: z.number().positive("O valor é obrigatório"),
 
   tipo: z.enum(TiposTransacao),
 
   num_transacao: z.number().optional(),
 });
 
-export const create = form
-  .strict()
-  .transform(d => ({
-    ...d,
-    contas_num_conta_destino: Number(d.contas_num_conta_destino),
-    contas_num_conta_origem: Number(d.contas_num_conta_origem),
-    valor: Number(d.valor),
-  }));
+export const create = form.strict().transform(d => ({
+  ...d,
+  contas_num_conta_destino: d.contas_num_conta_destino
+    ? Number(d.contas_num_conta_destino)
+    : null,
+  contas_num_conta_origem: Number(d.contas_num_conta_origem),
+}));
 
 const nonStrictUpdate = form.omit({ num_transacao: true });
 
-export const update = nonStrictUpdate
-  .strict()
-  .transform(d => ({
-    ...d,
-    contas_num_conta_destino: Number(d.contas_num_conta_destino),
-    contas_num_conta_origem: Number(d.contas_num_conta_origem),
-    valor: Number(d.valor),
-  }));
+export const update = nonStrictUpdate.strict().transform(d => ({
+  ...d,
+  contas_num_conta_destino: d.contas_num_conta_destino
+    ? Number(d.contas_num_conta_destino)
+    : null,
+  contas_num_conta_origem: Number(d.contas_num_conta_origem),
+}));
 
 export const prune = nonStrictUpdate
   .extend({
-    contas_num_conta_destino: z.number(),
+    contas_num_conta_destino: z.number().nullable().optional(),
     contas_num_conta_origem: z.number(),
-    valor: z.number(),
   })
   .transform(data => ({
     ...data,
-    contas_num_conta_destino: data.contas_num_conta_destino.toString(),
+    contas_num_conta_destino: data.contas_num_conta_destino?.toString(),
     contas_num_conta_origem: data.contas_num_conta_origem.toString(),
-    valor: data.valor.toString(),
   }));
 
 export const remove = z.object({ num_transacao: z.number() });

@@ -5,7 +5,7 @@ import { FormContainer } from "@/components/form/form-container";
 import { FormGroup } from "@/components/form/form-group";
 import { FormInput } from "@/components/form/form-input";
 import { FormSelect } from "@/components/form/form-select";
-import { useHandleSubmitMutation } from "@/hooks";
+import { useHandleSubmitMutation, useSearchQuery } from "@/hooks";
 import { type z } from "@/lib/zod";
 import { schemas } from "@/schemas";
 import { api } from "@/trpc/react";
@@ -29,9 +29,9 @@ export function TransacoesForm(props: TransacoesFormProps) {
 
   const form = useForm<FormData>({
     defaultValues: {
-      contas_num_conta_destino: "",
+      contas_num_conta_destino: null,
       contas_num_conta_origem: "",
-      valor: "",
+      valor: 0,
       ...data,
       num_transacao,
     },
@@ -45,22 +45,51 @@ export function TransacoesForm(props: TransacoesFormProps) {
       toast.success(
         `Transação ${data?.num_transacao} ${editando ? "atualizada" : "criada"} com sucesso!`,
       );
-      router.push(`/transacao${editando ? "/" + num_transacao : ""}`);
+      router.push(`/transacoes${editando ? "/" + num_transacao : ""}`);
     },
   });
 
+  const [watchTipo] = form.watch(["tipo"]);
+
+  const temDestino = watchTipo === "transferência" || watchTipo === "PIX";
+  const contaDestinoSelectProps = useSearchQuery("conta").selectProps;
+
   return (
     <FormContainer form={form} handleSubmit={handleSubmit}>
-
       <FormGroup>
-        {/* // TODO: Trocar por select com pesquisa ou não */}
-        <FormInput<FormData> required label="Conta Origem" name="contas_num_conta_origem" />
-        <FormInput<FormData> label="Conta Destino" name="contas_num_conta_destino" />
+        <FormSelect<FormData>
+          required
+          name="tipo"
+          label="Tipo Transação"
+          options={TiposTransacao.map(tt => ({
+            label: capitalize(tt),
+            value: tt,
+          }))}
+        />
+        <FormSelect<FormData>
+          required
+          name="contas_num_conta_origem"
+          label={temDestino ? "Conta Origem" : "Conta"}
+          {...useSearchQuery("conta").selectProps}
+        />
       </FormGroup>
 
       <FormGroup>
-        <FormSelect<FormData> required name="tipo" label="Tipo Transação" options={TiposTransacao.map(tt => ({ label: capitalize(tt), value: tt }))} />
-        <FormInput<FormData> required step="0.01" name="valor" label="Valor" type="number"/>
+        <FormInput<FormData>
+          required
+          min={0}
+          step="0.01"
+          name="valor"
+          label="Valor"
+          type="number"
+        />
+        {temDestino && (
+          <FormSelect<FormData>
+            label="Conta Destino"
+            name="contas_num_conta_destino"
+            {...contaDestinoSelectProps}
+          />
+        )}
       </FormGroup>
 
       <FormActions />

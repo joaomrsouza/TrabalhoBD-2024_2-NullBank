@@ -129,6 +129,7 @@ export function ClientesForm(props: ClientesFormProps) {
         />
         <FormInput<FormData>
           required
+          min={0}
           type="number"
           label="Número"
           name="end_numero"

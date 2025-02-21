@@ -96,6 +96,8 @@ export function ContasForm(props: ContasFormProps) {
         {watchTipo === "especial" && (
           <FormInput<FormData>
             required
+            min={0}
+            step="0.01"
             type="number"
             name="limite_credito"
             label="Limite de crédito"
@@ -104,6 +106,8 @@ export function ContasForm(props: ContasFormProps) {
         {watchTipo === "poupança" && (
           <FormInput<FormData>
             required
+            min={0}
+            step="0.01"
             type="number"
             name="taxa_juros"
             label="Taxa de juros"

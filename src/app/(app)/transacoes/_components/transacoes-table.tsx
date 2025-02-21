@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { useDataTable } from "@/hooks";
 import { type DataTableFilterField } from "@/hooks/use-data-table";
 import { type Transacao } from "@/server/database/queries/transacoes";
-import { formatCurrency, formatData } from "@/utils/formaters";
+import { formatCurrency, formatDataHora } from "@/utils/formaters";
 import { type ColumnDef } from "@tanstack/react-table";
+import { capitalize } from "lodash";
 import { TextSearchIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
@@ -71,41 +72,19 @@ function getColumns(): ColumnDef<TableData>[] {
       enableHiding: false,
       enableSorting: false,
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Número Transação" />
-      ),
-    },
-    {
-      accessorKey: "contas_num_conta_destino",
-      enableSorting: false,
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Conta Destino" />
+        <DataTableColumnHeader column={column} title="N. Transação" />
       ),
     },
     {
       accessorKey: "contas_num_conta_origem",
-      cell: ({ getValue }) => formatData(getValue<Date>()),
       enableSorting: false,
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Conta Origem" />
-      ),
-    },
-    {
-      accessorKey: "data_hora",
-      enableSorting: false,
-      // TODO: Formatar data-hora
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Data e Hora" />
-      ),
-    },
-    {
-      accessorKey: "num_transacao",
-      enableSorting: false,
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Número Transação" />
+        <DataTableColumnHeader column={column} title="Conta (Origem)" />
       ),
     },
     {
       accessorKey: "tipo",
+      cell: ({ getValue }) => capitalize(getValue<string>()),
       enableSorting: false,
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Tipo Transação" />
@@ -117,6 +96,21 @@ function getColumns(): ColumnDef<TableData>[] {
       enableSorting: false,
       header: ({ column }) => (
         <DataTableColumnHeader title="Valor" column={column} />
+      ),
+    },
+    {
+      accessorKey: "data_hora",
+      cell: ({ getValue }) => formatDataHora(getValue<Date>()),
+      enableSorting: false,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Data e Hora" />
+      ),
+    },
+    {
+      accessorKey: "contas_num_conta_destino",
+      enableSorting: false,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Conta Destino" />
       ),
     },
   ];
