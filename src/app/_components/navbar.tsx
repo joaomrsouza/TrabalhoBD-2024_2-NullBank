@@ -179,19 +179,19 @@ const menus: MenuItem[] = [
       { tipo: "divisor" },
       {
         cargo: ["dba"],
-        href: "/consultas/cidade/clientes",
+        href: "/consultas/cidades/clientes",
         tipo: "link",
         titulo: "Clientes por cidade",
       },
       {
         cargo: ["dba"],
-        href: "/consultas/cidade/funcionarios",
+        href: "/consultas/cidades/funcionarios",
         tipo: "link",
         titulo: "Funcionários por cidade",
       },
       {
         cargo: ["dba"],
-        href: "/consultas/cidade/agencias",
+        href: "/consultas/cidades/agencias",
         tipo: "link",
         titulo: "Agências por cidade",
       },
