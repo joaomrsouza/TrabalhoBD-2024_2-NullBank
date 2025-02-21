@@ -205,3 +205,18 @@ export async function getTelefonesByCPF(cpf: string) {
     SELECT telefone, tipo FROM telefones WHERE clientes_cpf = ${cpf}
   `;
 }
+
+export async function list(search: string) {
+  const searchNome = Number(!search);
+
+  return await db.sql<Array<Pick<Cliente, "cpf" | "nome">>>`
+    SELECT cpf, nome
+    FROM clientes
+    WHERE
+      cpf = ${search ?? ""}
+      OR
+      nome LIKE CONCAT('%', ${search ?? ""}, '%')
+      OR
+      ${searchNome} = 1
+  `;
+}

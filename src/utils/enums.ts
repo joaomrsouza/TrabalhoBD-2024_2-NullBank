@@ -42,8 +42,15 @@ export type Genero = (typeof Generos)[number];
 export const Cargos = ["gerente", "atendente", "caixa"] as const;
 export type Cargo = (typeof Cargos)[number];
 
-export const TiposTransacao = ["saque", "deposito", "pagamento", "estorno", "transferência", "PIX"] as const;
+export const TiposTransacao = [
+  "saque",
+  "deposito",
+  "pagamento",
+  "estorno",
+  "transferência",
+  "PIX",
+] as const;
 export type TipoTransacao = (typeof TiposTransacao)[number];
 
-export const ObjectsSearch = ["agencia", "funcionario"] as const;
+export const ObjectsSearch = ["agencia", "funcionario", "cliente"] as const;
 export type ObjectSearch = (typeof ObjectsSearch)[number];

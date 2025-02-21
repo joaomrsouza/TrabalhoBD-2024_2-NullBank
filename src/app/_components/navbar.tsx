@@ -166,13 +166,13 @@ const menus: MenuItem[] = [
       },
       {
         cargo: ["dba"],
-        href: "/consultas/clientes/transacoes-volume",
+        href: "/consultas/clientes/contas-transacoes-qtd",
         tipo: "link",
-        titulo: "Volume de transações por cliente",
+        titulo: "Qtd. transações contas por cliente",
       },
       {
         cargo: ["dba"],
-        href: "/consultas/clientes/transacoes-valor",
+        href: "/consultas/clientes/contas-transacoes-valor",
         tipo: "link",
         titulo: "Valor de transações por cliente",
       },

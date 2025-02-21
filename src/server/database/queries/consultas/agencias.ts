@@ -5,6 +5,11 @@ import { type schemas } from "@/schemas";
 import { type CountResponse } from "..";
 import { db } from "../..";
 
+type AgenciaParams = z.infer<typeof schemas.consultas.agencias.agenciaParams>;
+type AgenciaLastXDaysParams = z.infer<
+  typeof schemas.consultas.agencias.agenciaLastXDaysParams
+>;
+
 // 1.1. Quais os funcionários, seus cargos e seus endereços, cidades, seus salários e o número de dependentes de cada um, podendo ser classificados por ordem alfabética de nomes ou de salários;
 
 export type AgenciaFuncionarios = {
@@ -16,11 +21,6 @@ export type AgenciaFuncionarios = {
   nome: string;
   salario: number;
 };
-
-type AgenciaParams = z.infer<typeof schemas.consultas.agencias.agenciaParams>;
-type AgenciaLastXDaysParams = z.infer<
-  typeof schemas.consultas.agencias.agenciaLastXDaysParams
->;
 
 export async function funcionarios(params: AgenciaParams): Promise<{
   count: number;

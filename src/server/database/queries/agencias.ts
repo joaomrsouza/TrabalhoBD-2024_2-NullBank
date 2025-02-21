@@ -104,7 +104,7 @@ export async function deleteByNumero(numero: number) {
 export async function list(search: string) {
   const searchNome = Number(!search);
 
-  const result = await db.sql<Array<Pick<Agencia, "nome_ag" | "num_ag">>>`
+  return db.sql<Array<Pick<Agencia, "nome_ag" | "num_ag">>>`
     SELECT num_ag, nome_ag FROM agencias
     WHERE
       num_ag = ${search ?? ""}
@@ -113,6 +113,4 @@ export async function list(search: string) {
       OR
       ${searchNome} = 1
   `;
-
-  return result;
 }
