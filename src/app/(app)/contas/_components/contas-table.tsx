@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { useDataTable } from "@/hooks";
 import { type DataTableFilterField } from "@/hooks/use-data-table";
 import { type Conta } from "@/server/database/queries/contas";
+import { TiposConta } from "@/utils/enums";
 import { formatCurrency } from "@/utils/formaters";
 import { type ColumnDef } from "@tanstack/react-table";
+import { capitalize } from "lodash";
 import { TextSearchIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
@@ -71,7 +73,7 @@ function getColumns(): ColumnDef<TableData>[] {
       enableHiding: false,
       enableSorting: false,
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Número Agência" />
+        <DataTableColumnHeader column={column} title="N. Agência" />
       ),
     },
     {
@@ -85,7 +87,7 @@ function getColumns(): ColumnDef<TableData>[] {
       accessorKey: "num_conta",
       enableSorting: false,
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Número Conta" />
+        <DataTableColumnHeader column={column} title="N. Conta" />
       ),
     },
     {
@@ -98,7 +100,7 @@ function getColumns(): ColumnDef<TableData>[] {
     },
     {
       accessorKey: "tipo",
-      cell: ({ cell }) => formatCurrency(cell.getValue<number>()),
+      cell: ({ cell }) => capitalize(cell.getValue<string>()),
       enableSorting: false,
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Tipo Conta" />
@@ -110,16 +112,17 @@ function getColumns(): ColumnDef<TableData>[] {
 function getFilters(): DataTableFilterField<TableData>[] {
   return [
     {
-      label: "Tipo Conta",
-      placeholder: "Filtrar tipo conta...",
-      type: "text",
-      value: "tipo",
-    },
-    {
       label: "Número Conta",
       placeholder: "Filtrar número conta...",
       type: "text",
       value: "num_conta",
+    },
+    {
+      label: "Tipo Conta",
+      options: TiposConta.map(tc => ({ label: capitalize(tc), value: tc })),
+      placeholder: "Filtrar tipo conta...",
+      type: "select",
+      value: "tipo",
     },
   ];
 }

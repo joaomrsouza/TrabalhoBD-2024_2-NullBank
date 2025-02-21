@@ -26,15 +26,11 @@ export const searchRouter = createTRPCRouter({
             label: `${c.nome} (${c.cpf})`,
             value: c.cpf,
           })),
-        funcionario: async () => {
-          // TODO: Colocar query aqui
-          return [
-            {
-              label: "Funcionário teste",
-              value: "Valor teste",
-            },
-          ];
-        },
+        gerente: async () =>
+          (await db.queries.funcionarios.listGerente(input.search)).map(g => ({
+            label: `${g.nome} (${g.matricula})`,
+            value: g.matricula.toString(),
+          })),
       };
 
       return await resolvers[input.object]();

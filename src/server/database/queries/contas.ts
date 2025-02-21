@@ -4,6 +4,7 @@ import { AuthService } from "@/server/services/auth";
 import { type TipoConta } from "@/utils/enums";
 import { type CountResponse, type OpResponse } from ".";
 import { db } from "..";
+import { type ClientesHasContas } from "./clientes-has-contas";
 
 export type Conta = {
   agencias_num_ag: number;
@@ -15,12 +16,18 @@ export type Conta = {
   tipo: TipoConta;
 };
 
-export type ClientesHasContas = {
-  clientes_cpf: string;
-  contas_num_conta: number;
+export type ExtendedConta = Conta & {
+  data_aniversario?: Date;
+  limite_credito?: number;
+  taxa_juros?: number;
 };
 
-export type ContaUpsert = Omit<Conta, "num_conta" | "saldo" | "salt">;
+export type ContaUpsert = Omit<Conta, "num_conta" | "saldo" | "salt"> & {
+  clientes_cpf: Array<string>;
+  data_aniversario: string;
+  limite_credito: number;
+  taxa_juros: number;
+};
 
 type FilteredPageParams = z.infer<typeof schemas.conta.searchParams>;
 
@@ -39,7 +46,7 @@ export async function getFilteredPage(params: FilteredPageParams): Promise<{
       WHERE
         (num_conta = ${num_conta ?? ""} OR ${searchNumConta} = 1)
         AND
-        (tipo LIKE CONCAT('%', ${tipo ?? ""}, '%') OR ${searchTipo} = 1)
+        (tipo = ${tipo ?? ""} OR ${searchTipo} = 1)
       LIMIT ${String(skip)}, ${String(take)}
     `,
 
@@ -48,7 +55,7 @@ export async function getFilteredPage(params: FilteredPageParams): Promise<{
       WHERE
         (num_conta = ${num_conta ?? ""} OR ${searchNumConta} = 1)
         AND
-        (tipo = ${tipo} OR ${searchTipo} = 1)
+        (tipo = ${tipo ?? ""} OR ${searchTipo} = 1)
     `,
   ]);
 
@@ -71,8 +78,16 @@ export async function getByCliente(cpf: string) {
 }
 
 export async function getByNumero(numero: number) {
-  const result = await db.sql<Array<Conta>>`
-    SELECT * FROM contas WHERE num_conta = ${numero}
+  const result = await db.sql<Array<ExtendedConta>>`
+    SELECT *
+    FROM contas c
+      LEFT JOIN contas_corrente cc
+        ON c.num_conta = cc.contas_num_conta
+      LEFT JOIN contas_especial ce
+        ON c.num_conta = ce.contas_num_conta
+      LEFT JOIN contas_poupanca cp
+        ON c.num_conta = cp.contas_num_conta
+    WHERE num_conta = ${numero}
   `;
 
   return result[0] ?? null;
@@ -85,10 +100,44 @@ export async function insert(data: ContaUpsert) {
     INSERT INTO contas
       (agencias_num_ag, funcionarios_matricula_gerente, salt, senha, tipo)
     VALUES
-      (${data.agencias_num_ag}, ${data.funcionarios_matricula_gerente}, ${salt}, ${senha}, ${data.tipo})
+      (${data.agencias_num_ag}, ${data.funcionarios_matricula_gerente}, ${salt.toString("base64")}, ${senha.toString("base64")}, ${data.tipo})
   `;
 
-  // TODO: Criar e manusear os tipos de conta
+  await Promise.all(
+    data.clientes_cpf.map(
+      cpf =>
+        db.sql`
+          INSERT INTO clientes_has_contas
+            (contas_num_conta, clientes_cpf)
+          VALUES
+            (${result.insertId}, ${cpf})
+        `,
+    ),
+  );
+
+  if (data.tipo === "corrente")
+    await db.sql`
+      INSERT INTO contas_corrente
+        (contas_num_conta, data_aniversario)
+      VALUES
+        (${result.insertId}, ${data.data_aniversario})
+    `;
+
+  if (data.tipo === "especial")
+    await db.sql`
+      INSERT INTO contas_especial
+        (contas_num_conta, limite_credito)
+      VALUES
+        (${result.insertId}, ${data.limite_credito})
+    `;
+
+  if (data.tipo === "poupança")
+    await db.sql`
+      INSERT INTO contas_poupanca
+        (contas_num_conta, taxa_juros)
+      VALUES
+        (${result.insertId}, ${data.taxa_juros})
+    `;
 
   const newConta = await db.sql<Array<Conta>>`
     SELECT * FROM contas WHERE num_conta = ${result.insertId}
@@ -108,9 +157,9 @@ export async function updateByNumero(
       UPDATE contas SET
         agencias_num_ag = ${data.agencias_num_ag},
         funcionarios_matricula_gerente = ${data.funcionarios_matricula_gerente},
-        senha = ${senha},
-        salt = ${salt},
-        tipo = ${data.tipo},
+        senha = ${senha.toString("base64")},
+        salt = ${salt.toString("base64")},
+        tipo = ${data.tipo}
       WHERE num_conta = ${numero}
     `;
   } else {
@@ -118,12 +167,62 @@ export async function updateByNumero(
       UPDATE contas SET
         agencias_num_ag = ${data.agencias_num_ag},
         funcionarios_matricula_gerente = ${data.funcionarios_matricula_gerente},
-        tipo = ${data.tipo},
+        tipo = ${data.tipo}
       WHERE num_conta = ${numero}
     `;
   }
 
-  // TODO: Criar e manusear os tipos de conta
+  await db.sql`
+    DELETE FROM clientes_has_contas WHERE contas_num_conta = ${numero}
+  `;
+
+  await Promise.all(
+    data.clientes_cpf.map(
+      cpf =>
+        db.sql`
+          INSERT INTO clientes_has_contas
+            (contas_num_conta, clientes_cpf)
+          VALUES
+            (${numero}, ${cpf})
+        `,
+    ),
+  );
+
+  await Promise.all([
+    db.sql`
+      DELETE FROM contas_corrente WHERE contas_num_conta = ${numero}
+    `,
+    db.sql`
+      DELETE FROM contas_especial WHERE contas_num_conta = ${numero}
+    `,
+    db.sql`
+      DELETE FROM contas_poupanca WHERE contas_num_conta = ${numero}
+    `,
+  ]);
+
+  if (data.tipo === "corrente")
+    await db.sql`
+      INSERT INTO contas_corrente
+        (contas_num_conta, data_aniversario)
+      VALUES
+        (${numero}, ${data.data_aniversario})
+    `;
+
+  if (data.tipo === "especial")
+    await db.sql`
+      INSERT INTO contas_especial
+        (contas_num_conta, limite_credito)
+      VALUES
+        (${numero}, ${data.limite_credito})
+    `;
+
+  if (data.tipo === "poupança")
+    await db.sql`
+      INSERT INTO contas_poupanca
+        (contas_num_conta, taxa_juros)
+      VALUES
+        (${numero}, ${data.taxa_juros})
+    `;
 
   const updatedConta = await db.sql<Array<Conta>>`
     SELECT * FROM contas WHERE num_conta = ${numero}

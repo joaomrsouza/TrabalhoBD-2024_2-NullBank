@@ -34,8 +34,18 @@ export default async function EditarConta(props: PageProps) {
   const numeroValido = schemas.number.safeParse(numero);
   if (!numeroValido.success) return notFound();
 
-  const conta = await db.queries.contas.getByNumero(numeroValido.data);
-  const parsed = schemas.conta.prune.safeParse(conta);
+  const [conta, clientes] = await Promise.all([
+    db.queries.contas.getByNumero(numeroValido.data),
+    db.queries.clientesHasContas.getByNumero(numeroValido.data),
+  ]);
+
+  const parsed = schemas.conta.prune.safeParse({
+    ...conta,
+    clientes_cpf: clientes.map(c => c.clientes_cpf),
+    data_aniversario: conta?.data_aniversario ?? "",
+    limite_credito: conta?.limite_credito ?? 0,
+    taxa_juros: conta?.taxa_juros ?? 0,
+  });
 
   if (!parsed.success) notFound();
 

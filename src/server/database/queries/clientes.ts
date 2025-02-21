@@ -80,6 +80,16 @@ export async function getByCpf(cpf: string) {
   return result[0] ?? null;
 }
 
+export async function getByNumeroConta(numero: number) {
+  return await db.sql<Array<Cliente>>`
+    SELECT *
+    FROM clientes_has_contas chc
+      JOIN clientes c
+        ON chc.clientes_cpf = c.cpf
+    WHERE chc.contas_num_conta = ${numero}
+  `;
+}
+
 export async function getNomeByCpf(cpf: string) {
   const result = await db.sql<Array<Pick<Cliente, "nome">>>`
     SELECT nome FROM clientes WHERE cpf = ${cpf}

@@ -33,7 +33,7 @@ export default async function Contas(props: PageProps) {
         <PageHeader>Contas</PageHeader>
         {canCreate && (
           <Button asChild>
-            <Link href="./conts/novo">
+            <Link href="./contas/novo">
               <PlusIcon className="mr-2 size-4" />
               Nova Conta
             </Link>

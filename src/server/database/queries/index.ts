@@ -1,5 +1,6 @@
 import * as agencias from "./agencias";
 import * as clientes from "./clientes";
+import * as clientesHasContas from "./clientes-has-contas";
 import { consultas } from "./consultas";
 import * as contas from "./contas";
 import * as dependentes from "./dependentes";
@@ -21,6 +22,7 @@ export type CountResponse = [{ count: number }];
 export const databaseQueries = {
   agencias,
   clientes,
+  clientesHasContas,
   consultas,
   contas,
   dependentes,

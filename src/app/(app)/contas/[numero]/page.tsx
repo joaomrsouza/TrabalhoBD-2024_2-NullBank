@@ -8,6 +8,8 @@ import { Separator } from "@/components/ui/separator";
 import { schemas } from "@/schemas";
 import { db } from "@/server/database";
 import { Permission } from "@/server/services/permission";
+import { formatCurrency, formatData } from "@/utils/formaters";
+import { capitalize } from "lodash";
 import { ArrowLeftIcon } from "lucide-react";
 import { type Metadata } from "next";
 import Link from "next/link";
@@ -37,7 +39,10 @@ export default async function ExibirConta(props: PageProps) {
   const numeroValido = schemas.number.safeParse(numero);
   if (!numeroValido.success) return notFound();
 
-  const conta = await db.queries.contas.getByNumero(numeroValido.data);
+  const [conta, clientes] = await Promise.all([
+    db.queries.contas.getByNumero(numeroValido.data),
+    db.queries.clientes.getByNumeroConta(numeroValido.data),
+  ]);
 
   if (!conta) return notFound();
 
@@ -47,9 +52,7 @@ export default async function ExibirConta(props: PageProps) {
   return (
     <PageContainer>
       <div className="flex items-center justify-between">
-        <PageHeader>
-          Conta #{conta.num_conta}
-        </PageHeader>
+        <PageHeader>Conta #{conta.num_conta}</PageHeader>
         <Button asChild variant="ghost">
           <Link href="./">
             <ArrowLeftIcon className="mr-2 size-4" />
@@ -64,17 +67,53 @@ export default async function ExibirConta(props: PageProps) {
         canDelete={canDelete}
         numero={numeroValido.data}
       />
+
       <ShowSection title="Cadastro">
         <ShowGroup>
-          <ShowField label="Número da Agência">{conta.agencias_num_ag}</ShowField>
-          <ShowField label="Matrícula Gerente">{conta.funcionarios_matricula_gerente}</ShowField>
+          <ShowField label="Número da Agência">
+            {conta.agencias_num_ag}
+          </ShowField>
+          <ShowField label="Matrícula Gerente">
+            {conta.funcionarios_matricula_gerente}
+          </ShowField>
         </ShowGroup>
 
         <ShowGroup>
-          <ShowField label="Saldo">{conta.saldo}</ShowField>
-          <ShowField label="Tipo Conta">{conta.tipo}</ShowField>
+          <ShowField label="Saldo">{formatCurrency(conta.saldo)}</ShowField>
+          <ShowField label="Tipo Conta">{capitalize(conta.tipo)}</ShowField>
+          {conta.tipo === "corrente" && (
+            <ShowField label="Data Aniversário">
+              {conta.data_aniversario
+                ? formatData(conta.data_aniversario)
+                : "-"}
+            </ShowField>
+          )}
+          {conta.tipo === "especial" && (
+            <ShowField label="Limite de Crédito">
+              {conta.limite_credito
+                ? formatCurrency(conta.limite_credito)
+                : "-"}
+            </ShowField>
+          )}
+          {conta.tipo === "poupança" && (
+            <ShowField label="Taxa de Juros">{conta.taxa_juros}%</ShowField>
+          )}
         </ShowGroup>
       </ShowSection>
+
+      <ShowSection title="Cliente(s)">
+        {clientes.map((c, index) => (
+          <ShowGroup key={c.cpf}>
+            <ShowField label={`CPF do cliente #${index + 1}`}>
+              {c.cpf}
+            </ShowField>
+            <ShowField label={`Nome do cliente #${index + 1}`}>
+              {c.nome}
+            </ShowField>
+          </ShowGroup>
+        ))}
+      </ShowSection>
+
       <ShowContaActions
         canEdit={canEdit}
         canDelete={canDelete}

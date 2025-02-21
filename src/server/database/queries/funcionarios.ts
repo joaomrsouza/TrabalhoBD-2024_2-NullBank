@@ -141,3 +141,19 @@ export async function deleteByMatricula(matricula: number) {
     WHERE matricula = ${matricula}
   `;
 }
+
+export async function listGerente(search: string) {
+  const searchNome = Number(!search);
+
+  return db.sql<Array<Pick<Funcionario, "matricula" | "nome">>>`
+    SELECT nome, matricula FROM funcionarios
+    WHERE
+      (
+        matricula = ${search ?? ""}
+        OR
+        nome LIKE CONCAT('%', ${search ?? ""}, '%')
+        OR
+        ${searchNome} = 1
+      ) AND cargo = 'gerente'
+  `;
+}
