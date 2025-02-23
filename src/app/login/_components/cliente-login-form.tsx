@@ -37,7 +37,7 @@ export function ClienteLoginForm() {
   const [watchLogin, watchConta] = form.watch(["login", "conta"]);
 
   const cleanedCpf = React.useMemo(
-    () => watchLogin.replace(/\D/g, "").trim(),
+    () => (watchLogin ? watchLogin.replace(/\D/g, "").trim() : ""),
     [watchLogin],
   );
 

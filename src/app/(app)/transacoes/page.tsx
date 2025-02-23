@@ -10,7 +10,7 @@ import { type Metadata } from "next";
 import Link from "next/link";
 import { TransacaoTable } from "./_components/transacoes-table";
 
-export const metadata: Metadata = { title: "Trasanções" };
+export const metadata: Metadata = { title: "Transações" };
 
 interface PageProps {
   searchParams: Promise<unknown>;
