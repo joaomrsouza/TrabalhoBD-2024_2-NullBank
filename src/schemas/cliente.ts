@@ -33,26 +33,32 @@ export const form = z.object({
     .trim()
     .length(2, "A UF do RG deve ser um código de estado (Ex: 'CE', SP)"),
 
-  emails: z.array(
-    z.object({
-      email: z.string().email(),
+  emails: z
+    .array(
+      z.object({
+        email: z.string().email().nullable(),
 
-      tipo: z.string().trim(),
-    }),
-  ),
+        tipo: z.string().trim().nullable(),
+      }),
+    )
+    .transform(data => data.filter(d => (d.email?.length ?? 0) > 1)),
 
-  telefones: z.array(
-    z.object({
-      telefone: z
-        .string()
-        .regex(
-          /\(\d{2}\) \d{5}\-\d{4}/,
-          "O telefone deve estar no formato (00) 00000-0000.",
-        ),
+  telefones: z
+    .array(
+      z.object({
+        telefone: z
+          .string()
+          .regex(
+            /\(\d{2}\) \d{5}\-\d{4}/,
+            "O telefone deve estar no formato (00) 00000-0000.",
+          )
+          .or(z.literal(""))
+          .nullable(),
 
-      tipo: z.string().trim(),
-    }),
-  ),
+        tipo: z.string().trim().nullable(),
+      }),
+    )
+    .transform(data => data.filter(d => (d.telefone?.length ?? 0) > 1)),
 });
 
 export const create = form

@@ -41,7 +41,7 @@ export function AgenciasForm(props: AgenciasFormProps) {
       toast.success(
         `Agência ${data?.nome_ag} ${editando ? "atualizada" : "criada"} com sucesso!`,
       );
-      router.push(`/agencias${editando ? "/" + num_ag : ""}`);
+      router.push(`/agencias${data?.num_ag ? "/" + data.num_ag : ""}`);
     },
   });
 

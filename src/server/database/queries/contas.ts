@@ -96,139 +96,156 @@ export async function getByNumero(numero: number) {
 export async function insert(data: ContaUpsert) {
   const { hash: senha, salt } = await AuthService.hashPassword(data.senha);
 
-  const result = await db.sql<OpResponse>`
-    INSERT INTO contas
-      (agencias_num_ag, funcionarios_matricula_gerente, salt, senha, tipo)
-    VALUES
-      (${data.agencias_num_ag}, ${data.funcionarios_matricula_gerente}, ${salt.toString("base64")}, ${senha.toString("base64")}, ${data.tipo})
-  `;
+  try {
+    await db.beginTransaction();
 
-  await Promise.all(
-    data.clientes_cpf.map(
-      cpf =>
-        db.sql`
-          INSERT INTO clientes_has_contas
-            (contas_num_conta, clientes_cpf)
-          VALUES
-            (${result.insertId}, ${cpf})
-        `,
-    ),
-  );
-
-  if (data.tipo === "corrente")
-    await db.sql`
-      INSERT INTO contas_corrente
-        (contas_num_conta, data_aniversario)
+    const result = await db.sql<OpResponse>`
+      INSERT INTO contas
+        (agencias_num_ag, funcionarios_matricula_gerente, salt, senha, tipo)
       VALUES
-        (${result.insertId}, ${data.data_aniversario})
+        (${data.agencias_num_ag}, ${data.funcionarios_matricula_gerente}, ${salt.toString("base64")}, ${senha.toString("base64")}, ${data.tipo})
     `;
 
-  if (data.tipo === "especial")
-    await db.sql`
-      INSERT INTO contas_especial
-        (contas_num_conta, limite_credito)
-      VALUES
-        (${result.insertId}, ${data.limite_credito})
+    await Promise.all(
+      data.clientes_cpf.map(
+        cpf =>
+          db.sql`
+            INSERT INTO clientes_has_contas
+              (contas_num_conta, clientes_cpf)
+            VALUES
+              (${result.insertId}, ${cpf})
+          `,
+      ),
+    );
+
+    if (data.tipo === "corrente")
+      await db.sql`
+        INSERT INTO contas_corrente
+          (contas_num_conta, data_aniversario)
+        VALUES
+          (${result.insertId}, ${data.data_aniversario})
+      `;
+
+    if (data.tipo === "especial")
+      await db.sql`
+        INSERT INTO contas_especial
+          (contas_num_conta, limite_credito)
+        VALUES
+          (${result.insertId}, ${data.limite_credito})
+      `;
+
+    if (data.tipo === "poupança")
+      await db.sql`
+        INSERT INTO contas_poupanca
+          (contas_num_conta, taxa_juros)
+        VALUES
+          (${result.insertId}, ${data.taxa_juros})
+      `;
+
+    await db.commit();
+
+    const newConta = await db.sql<Array<Conta>>`
+      SELECT * FROM contas WHERE num_conta = ${result.insertId}
     `;
 
-  if (data.tipo === "poupança")
-    await db.sql`
-      INSERT INTO contas_poupanca
-        (contas_num_conta, taxa_juros)
-      VALUES
-        (${result.insertId}, ${data.taxa_juros})
-    `;
-
-  const newConta = await db.sql<Array<Conta>>`
-    SELECT * FROM contas WHERE num_conta = ${result.insertId}
-  `;
-
-  return newConta[0] ?? null;
+    return newConta[0] ?? null;
+  } catch (error) {
+    await db.rollback();
+    throw error;
+  }
 }
 
 export async function updateByNumero(
   numero: number,
   data: { senha?: string } & Omit<ContaUpsert, "senha">,
 ) {
-  if (data.senha) {
-    const { hash: senha, salt } = await AuthService.hashPassword(data.senha);
+  try {
+    await db.beginTransaction();
+
+    if (data.senha) {
+      const { hash: senha, salt } = await AuthService.hashPassword(data.senha);
+      await db.sql`
+        UPDATE contas SET
+          agencias_num_ag = ${data.agencias_num_ag},
+          funcionarios_matricula_gerente = ${data.funcionarios_matricula_gerente},
+          senha = ${senha.toString("base64")},
+          salt = ${salt.toString("base64")},
+          tipo = ${data.tipo}
+        WHERE num_conta = ${numero}
+      `;
+    } else {
+      await db.sql`
+        UPDATE contas SET
+          agencias_num_ag = ${data.agencias_num_ag},
+          funcionarios_matricula_gerente = ${data.funcionarios_matricula_gerente},
+          tipo = ${data.tipo}
+        WHERE num_conta = ${numero}
+      `;
+    }
 
     await db.sql`
-      UPDATE contas SET
-        agencias_num_ag = ${data.agencias_num_ag},
-        funcionarios_matricula_gerente = ${data.funcionarios_matricula_gerente},
-        senha = ${senha.toString("base64")},
-        salt = ${salt.toString("base64")},
-        tipo = ${data.tipo}
-      WHERE num_conta = ${numero}
+      DELETE FROM clientes_has_contas WHERE contas_num_conta = ${numero}
     `;
-  } else {
-    await db.sql`
-      UPDATE contas SET
-        agencias_num_ag = ${data.agencias_num_ag},
-        funcionarios_matricula_gerente = ${data.funcionarios_matricula_gerente},
-        tipo = ${data.tipo}
-      WHERE num_conta = ${numero}
+
+    await Promise.all(
+      data.clientes_cpf.map(
+        cpf =>
+          db.sql`
+            INSERT INTO clientes_has_contas
+              (contas_num_conta, clientes_cpf)
+            VALUES
+              (${numero}, ${cpf})
+          `,
+      ),
+    );
+
+    await Promise.all([
+      db.sql`
+        DELETE FROM contas_corrente WHERE contas_num_conta = ${numero}
+      `,
+      db.sql`
+        DELETE FROM contas_especial WHERE contas_num_conta = ${numero}
+      `,
+      db.sql`
+        DELETE FROM contas_poupanca WHERE contas_num_conta = ${numero}
+      `,
+    ]);
+
+    if (data.tipo === "corrente")
+      await db.sql`
+        INSERT INTO contas_corrente
+          (contas_num_conta, data_aniversario)
+        VALUES
+          (${numero}, ${data.data_aniversario})
+      `;
+
+    if (data.tipo === "especial")
+      await db.sql`
+        INSERT INTO contas_especial
+          (contas_num_conta, limite_credito)
+        VALUES
+          (${numero}, ${data.limite_credito})
+      `;
+
+    if (data.tipo === "poupança")
+      await db.sql`
+        INSERT INTO contas_poupanca
+          (contas_num_conta, taxa_juros)
+        VALUES
+          (${numero}, ${data.taxa_juros})
+      `;
+
+    await db.commit();
+
+    const updatedConta = await db.sql<Array<Conta>>`
+      SELECT * FROM contas WHERE num_conta = ${numero}
     `;
+
+    return updatedConta[0] ?? null;
+  } catch (error) {
+    await db.rollback();
+    throw error;
   }
-
-  await db.sql`
-    DELETE FROM clientes_has_contas WHERE contas_num_conta = ${numero}
-  `;
-
-  await Promise.all(
-    data.clientes_cpf.map(
-      cpf =>
-        db.sql`
-          INSERT INTO clientes_has_contas
-            (contas_num_conta, clientes_cpf)
-          VALUES
-            (${numero}, ${cpf})
-        `,
-    ),
-  );
-
-  await Promise.all([
-    db.sql`
-      DELETE FROM contas_corrente WHERE contas_num_conta = ${numero}
-    `,
-    db.sql`
-      DELETE FROM contas_especial WHERE contas_num_conta = ${numero}
-    `,
-    db.sql`
-      DELETE FROM contas_poupanca WHERE contas_num_conta = ${numero}
-    `,
-  ]);
-
-  if (data.tipo === "corrente")
-    await db.sql`
-      INSERT INTO contas_corrente
-        (contas_num_conta, data_aniversario)
-      VALUES
-        (${numero}, ${data.data_aniversario})
-    `;
-
-  if (data.tipo === "especial")
-    await db.sql`
-      INSERT INTO contas_especial
-        (contas_num_conta, limite_credito)
-      VALUES
-        (${numero}, ${data.limite_credito})
-    `;
-
-  if (data.tipo === "poupança")
-    await db.sql`
-      INSERT INTO contas_poupanca
-        (contas_num_conta, taxa_juros)
-      VALUES
-        (${numero}, ${data.taxa_juros})
-    `;
-
-  const updatedConta = await db.sql<Array<Conta>>`
-    SELECT * FROM contas WHERE num_conta = ${numero}
-  `;
-
-  return updatedConta[0] ?? null;
 }
 
 export async function deleteByNumero(numero: number) {

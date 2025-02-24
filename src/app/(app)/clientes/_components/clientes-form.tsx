@@ -57,7 +57,7 @@ export function ClientesForm(props: ClientesFormProps) {
       toast.success(
         `Cliente ${data?.cpf} ${editando ? "atualizado" : "criado"} com sucesso!`,
       );
-      router.push(`/clientes${editando ? "/" + cpf : ""}`);
+      router.push(`/clientes${data?.cpf ? "/" + data.cpf : ""}`);
     },
   });
 

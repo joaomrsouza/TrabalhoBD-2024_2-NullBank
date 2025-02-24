@@ -16,18 +16,18 @@ import { notFound } from "next/navigation";
 import { ShowClienteActions } from "./_components/show-clientes-actions";
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ cpf: string }>;
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-  const { id } = await props.params;
+  const { cpf } = await props.params;
 
   const notFound = { title: "Cliente não encontrado" };
 
-  const idValido = schemas.string.safeParse(id);
-  if (!idValido.success) return notFound;
+  const cpfValido = schemas.string.safeParse(cpf);
+  if (!cpfValido.success) return notFound;
 
-  const cliente = await db.queries.clientes.getNomeByCpf(idValido.data);
+  const cliente = await db.queries.clientes.getNomeByCpf(cpfValido.data);
 
   if (!cliente) return notFound;
 
@@ -35,20 +35,20 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 }
 
 export default async function ExibirCliente(props: PageProps) {
-  const { id } = await props.params;
+  const { cpf } = await props.params;
 
   const user = await Permission.safeGetAuthUser(["dba"]);
 
-  const idValido = schemas.string.safeParse(id);
-  if (!idValido.success) return notFound();
+  const cpfValido = schemas.string.safeParse(cpf);
+  if (!cpfValido.success) return notFound();
 
-  const cliente = await db.queries.clientes.getByCpf(idValido.data);
+  const cliente = await db.queries.clientes.getByCpf(cpfValido.data);
 
   if (!cliente) return notFound();
 
   const [emails, telefones] = await Promise.all([
-    db.queries.clientes.getEmailsByCPF(idValido.data),
-    db.queries.clientes.getTelefonesByCPF(idValido.data),
+    db.queries.clientes.getEmailsByCPF(cpfValido.data),
+    db.queries.clientes.getTelefonesByCPF(cpfValido.data),
   ]);
 
   const canEdit = Permission.temPermissaoDeAcesso(["dba"], user);
@@ -71,7 +71,7 @@ export default async function ExibirCliente(props: PageProps) {
 
       <ShowClienteActions
         canEdit={canEdit}
-        id={idValido.data}
+        cpf={cpfValido.data}
         canDelete={canDelete}
       />
       <ShowSection title="Cadastro">
@@ -107,29 +107,35 @@ export default async function ExibirCliente(props: PageProps) {
         </ShowGroup>
       </ShowSection>
 
-      <ShowSection title="E-mails">
-        {emails.map(({ email, tipo }, index) => (
-          <ShowGroup key={email}>
-            <ShowField label={`Tipo de E-mail ${index + 1}`}>{tipo}</ShowField>
-            <ShowField label={`E-mail ${index + 1}`}>{email}</ShowField>
-          </ShowGroup>
-        ))}
-      </ShowSection>
+      {!!emails.length && (
+        <ShowSection title="E-mails">
+          {emails.map(({ email, tipo }, index) => (
+            <ShowGroup key={email}>
+              <ShowField label={`Tipo de E-mail ${index + 1}`}>
+                {tipo}
+              </ShowField>
+              <ShowField label={`E-mail ${index + 1}`}>{email}</ShowField>
+            </ShowGroup>
+          ))}
+        </ShowSection>
+      )}
 
-      <ShowSection title="Telefones">
-        {telefones.map(({ telefone, tipo }, index) => (
-          <ShowGroup key={telefone}>
-            <ShowField label={`Tipo de Telefone ${index + 1}`}>
-              {tipo}
-            </ShowField>
-            <ShowField label={`Telefone ${index + 1}`}>{telefone}</ShowField>
-          </ShowGroup>
-        ))}
-      </ShowSection>
+      {!!telefones.length && (
+        <ShowSection title="Telefones">
+          {telefones.map(({ telefone, tipo }, index) => (
+            <ShowGroup key={telefone}>
+              <ShowField label={`Tipo de Telefone ${index + 1}`}>
+                {tipo}
+              </ShowField>
+              <ShowField label={`Telefone ${index + 1}`}>{telefone}</ShowField>
+            </ShowGroup>
+          ))}
+        </ShowSection>
+      )}
 
       <ShowClienteActions
         canEdit={canEdit}
-        id={idValido.data}
+        cpf={cpfValido.data}
         canDelete={canDelete}
       />
     </PageContainer>

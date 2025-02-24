@@ -6,18 +6,18 @@ import { api } from "@/trpc/react";
 interface ShowClienteActionsProps {
   canDelete: boolean;
   canEdit: boolean;
-  id: string;
+  cpf: string;
 }
 
 export function ShowClienteActions(props: ShowClienteActionsProps) {
-  const { canDelete, canEdit, id } = props;
+  const { canDelete, canEdit, cpf } = props;
 
   return (
     <ShowActions
-      registryId={id}
+      registryId={cpf}
       canEdit={canEdit}
       canDelete={canDelete}
-      deleteParams={{ cpf: id }}
+      deleteParams={{ cpf }}
       deleteMutationCall={api.clientes.delete}
     />
   );

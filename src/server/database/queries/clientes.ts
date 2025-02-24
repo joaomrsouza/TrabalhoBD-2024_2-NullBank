@@ -99,109 +99,136 @@ export async function getNomeByCpf(cpf: string) {
 }
 
 export async function insert(data: ClienteUpsert) {
-  const result = await db.sql<OpResponse>`
-    INSERT INTO clientes
-      (cpf, nome, data_nasc, rg_num, rg_orgao_emissor, rg_uf, end_tipo, end_logradouro, end_numero, end_bairro, end_cep, end_cidade, end_estado)
-    VALUES
-      (${data.cpf}, ${data.nome}, ${data.data_nasc}, ${data.rg_num}, ${data.rg_orgao_emissor}, ${data.rg_uf}, ${data.end_tipo}, ${data.end_logradouro}, ${data.end_numero}, ${data.end_bairro}, ${data.end_cep}, ${data.end_cidade}, ${data.end_estado})
-  `;
+  try {
+    await db.beginTransaction();
 
-  await Promise.all([
-    ...data.emails.map(
-      ({ email, tipo }) => db.sql<OpResponse>`
-        INSERT INTO emails
-          (clientes_cpf, email, tipo)
-        VALUES
-          (${data.cpf}, ${email}, ${tipo})
-      `,
-    ),
-    ...data.telefones.map(
-      ({ telefone, tipo }) => db.sql<OpResponse>`
-        INSERT INTO telefones
-          (clientes_cpf, telefone, tipo)
-        VALUES
-          (${data.cpf}, ${telefone}, ${tipo})
-      `,
-    ),
-  ]);
+    const result = await db.sql<OpResponse>`
+      INSERT INTO clientes
+        (cpf, nome, data_nasc, rg_num, rg_orgao_emissor, rg_uf, end_tipo, end_logradouro, end_numero, end_bairro, end_cep, end_cidade, end_estado)
+      VALUES
+        (${data.cpf}, ${data.nome}, ${data.data_nasc}, ${data.rg_num}, ${data.rg_orgao_emissor}, ${data.rg_uf}, ${data.end_tipo}, ${data.end_logradouro}, ${data.end_numero}, ${data.end_bairro}, ${data.end_cep}, ${data.end_cidade}, ${data.end_estado})
+    `;
 
-  const newCliente = await db.sql<Array<Cliente>>`
-    SELECT * FROM clientes WHERE cpf = ${result.insertId}
-  `;
+    await Promise.all([
+      ...data.emails.map(
+        ({ email, tipo }) => db.sql<OpResponse>`
+          INSERT INTO emails
+            (clientes_cpf, email, tipo)
+          VALUES
+            (${data.cpf}, ${email}, ${tipo})
+        `,
+      ),
+      ...data.telefones.map(
+        ({ telefone, tipo }) => db.sql<OpResponse>`
+          INSERT INTO telefones
+            (clientes_cpf, telefone, tipo)
+          VALUES
+            (${data.cpf}, ${telefone}, ${tipo})
+        `,
+      ),
+    ]);
 
-  return newCliente[0] ?? null;
+    await db.commit();
+
+    const newCliente = await db.sql<Array<Cliente>>`
+      SELECT * FROM clientes WHERE cpf = ${result.insertId}
+    `;
+
+    return newCliente[0] ?? null;
+  } catch (error) {
+    await db.rollback();
+    throw error;
+  }
 }
 
 export async function updateByCPF(
   cpf: string,
   data: Omit<ClienteUpsert, "cpf">,
 ) {
-  await db.sql`
-    UPDATE clientes SET
-      nome = ${data.nome},
-      data_nasc = ${data.data_nasc},
-      rg_num = ${data.rg_num},
-      rg_orgao_emissor = ${data.rg_orgao_emissor},
-      rg_uf = ${data.rg_uf},
-      end_tipo = ${data.end_tipo},
-      end_logradouro = ${data.end_logradouro},
-      end_numero = ${data.end_numero},
-      end_bairro = ${data.end_bairro},
-      end_cep = ${data.end_cep},
-      end_cidade = ${data.end_cidade},
-      end_estado = ${data.end_estado}
-    WHERE cpf = ${cpf}
-  `;
+  try {
+    await db.beginTransaction();
 
-  await Promise.all([
-    db.sql<OpResponse>`
-      DELETE FROM emails WHERE clientes_cpf = ${cpf}
-    `,
-    db.sql<OpResponse>`
-      DELETE FROM telefones WHERE clientes_cpf = ${cpf}
-    `,
-  ]);
+    await db.sql`
+      UPDATE clientes SET
+        nome = ${data.nome},
+        data_nasc = ${data.data_nasc},
+        rg_num = ${data.rg_num},
+        rg_orgao_emissor = ${data.rg_orgao_emissor},
+        rg_uf = ${data.rg_uf},
+        end_tipo = ${data.end_tipo},
+        end_logradouro = ${data.end_logradouro},
+        end_numero = ${data.end_numero},
+        end_bairro = ${data.end_bairro},
+        end_cep = ${data.end_cep},
+        end_cidade = ${data.end_cidade},
+        end_estado = ${data.end_estado}
+      WHERE cpf = ${cpf}
+    `;
 
-  await Promise.all([
-    ...data.emails.map(
-      ({ email, tipo }) => db.sql<OpResponse>`
-        INSERT INTO emails
-          (clientes_cpf, email, tipo)
-        VALUES
-          (${cpf}, ${email}, ${tipo})
+    await Promise.all([
+      db.sql<OpResponse>`
+        DELETE FROM emails WHERE clientes_cpf = ${cpf}
       `,
-    ),
-    ...data.telefones.map(
-      ({ telefone, tipo }) => db.sql<OpResponse>`
-        INSERT INTO telefones
-          (clientes_cpf, telefone, tipo)
-        VALUES
-          (${cpf}, ${telefone}, ${tipo})
+      db.sql<OpResponse>`
+        DELETE FROM telefones WHERE clientes_cpf = ${cpf}
       `,
-    ),
-  ]);
+    ]);
 
-  const updatedCliente = await db.sql<Array<Cliente>>`
-    SELECT * FROM clientes WHERE cpf = ${cpf}
-  `;
+    await Promise.all([
+      ...data.emails.map(
+        ({ email, tipo }) => db.sql<OpResponse>`
+          INSERT INTO emails
+            (clientes_cpf, email, tipo)
+          VALUES
+            (${cpf}, ${email}, ${tipo})
+        `,
+      ),
+      ...data.telefones.map(
+        ({ telefone, tipo }) => db.sql<OpResponse>`
+          INSERT INTO telefones
+            (clientes_cpf, telefone, tipo)
+          VALUES
+            (${cpf}, ${telefone}, ${tipo})
+        `,
+      ),
+    ]);
 
-  return updatedCliente[0] ?? null;
+    await db.commit();
+
+    const updatedCliente = await db.sql<Array<Cliente>>`
+      SELECT * FROM clientes WHERE cpf = ${cpf}
+    `;
+
+    return updatedCliente[0] ?? null;
+  } catch (error) {
+    await db.rollback();
+    throw error;
+  }
 }
 
 export async function deleteByCPF(cpf: string) {
-  await Promise.all([
-    db.sql<OpResponse>`
-      DELETE FROM emails WHERE clientes_cpf = ${cpf}
-    `,
-    db.sql<OpResponse>`
-      DELETE FROM telefones WHERE clientes_cpf = ${cpf}
-    `,
-  ]);
+  try {
+    await db.beginTransaction();
 
-  await db.sql`
-    DELETE FROM clientes
-    WHERE cpf = ${cpf}
-  `;
+    await Promise.all([
+      db.sql<OpResponse>`
+        DELETE FROM emails WHERE clientes_cpf = ${cpf}
+      `,
+      db.sql<OpResponse>`
+        DELETE FROM telefones WHERE clientes_cpf = ${cpf}
+      `,
+    ]);
+
+    await db.sql`
+      DELETE FROM clientes
+      WHERE cpf = ${cpf}
+    `;
+
+    await db.commit();
+  } catch (error) {
+    await db.rollback();
+    throw error;
+  }
 }
 
 export async function getEmailsByCPF(cpf: string) {

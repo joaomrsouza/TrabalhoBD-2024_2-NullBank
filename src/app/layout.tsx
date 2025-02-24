@@ -3,6 +3,7 @@ import "@/styles/globals.css";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 
+import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import { TRPCReactProvider } from "@/trpc/react";
 import { Inter as FontSans } from "next/font/google";
@@ -38,6 +39,7 @@ export default function RootLayout({
           <QueryProvider>
             <ThemeProvider enableSystem attribute="class" defaultTheme="system">
               {children}
+              <Toaster />
             </ThemeProvider>
           </QueryProvider>
         </TRPCReactProvider>

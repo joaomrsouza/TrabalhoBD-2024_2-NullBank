@@ -45,7 +45,9 @@ export function TransacoesForm(props: TransacoesFormProps) {
       toast.success(
         `Transação ${data?.num_transacao} ${editando ? "atualizada" : "criada"} com sucesso!`,
       );
-      router.push(`/transacoes${editando ? "/" + num_transacao : ""}`);
+      router.push(
+        `/transacoes${data?.num_transacao ? "/" + data.num_transacao : ""}`,
+      );
     },
   });
 

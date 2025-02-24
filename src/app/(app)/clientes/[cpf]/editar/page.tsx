@@ -12,18 +12,18 @@ import { notFound } from "next/navigation";
 import { ClientesForm } from "../../_components/clientes-form";
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ cpf: string }>;
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-  const { id } = await props.params;
+  const { cpf } = await props.params;
 
   const notFound = { title: "Cliente não encontrado" };
 
-  const idValido = schemas.string.safeParse(id);
-  if (!idValido.success) return notFound;
+  const cpfValido = schemas.string.safeParse(cpf);
+  if (!cpfValido.success) return notFound;
 
-  const cliente = await db.queries.clientes.getNomeByCpf(idValido.data);
+  const cliente = await db.queries.clientes.getNomeByCpf(cpfValido.data);
 
   if (!cliente) return notFound;
 
@@ -31,17 +31,17 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 }
 
 export default async function EditarCliente(props: PageProps) {
-  const { id } = await props.params;
+  const { cpf } = await props.params;
 
   await Permission.safeGetAuthUser(["dba"]);
 
-  const idValido = schemas.string.safeParse(id);
-  if (!idValido.success) return notFound();
+  const cpfValido = schemas.string.safeParse(cpf);
+  if (!cpfValido.success) return notFound();
 
   const [cliente, emails, telefones] = await Promise.all([
-    db.queries.clientes.getByCpf(idValido.data),
-    db.queries.clientes.getEmailsByCPF(idValido.data),
-    db.queries.clientes.getTelefonesByCPF(idValido.data),
+    db.queries.clientes.getByCpf(cpfValido.data),
+    db.queries.clientes.getEmailsByCPF(cpfValido.data),
+    db.queries.clientes.getTelefonesByCPF(cpfValido.data),
   ]);
   const parsed = schemas.cliente.prune.safeParse({
     ...cliente,
@@ -64,7 +64,7 @@ export default async function EditarCliente(props: PageProps) {
       </div>
       <Separator />
       <section className="container">
-        <ClientesForm data={parsed.data} cpf={idValido.data} />
+        <ClientesForm data={parsed.data} cpf={cpfValido.data} />
       </section>
     </PageContainer>
   );

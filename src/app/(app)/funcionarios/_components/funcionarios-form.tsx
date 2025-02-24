@@ -54,7 +54,9 @@ export function FuncionariosForm(props: FuncionariosFormProps) {
       toast.success(
         `Funcionário ${data?.matricula} ${editando ? "atualizado" : "criado"} com sucesso!`,
       );
-      router.push(`/funcionarios${editando ? "/" + matricula : ""}`);
+      router.push(
+        `/funcionarios${data?.matricula ? "/" + data.matricula : ""}`,
+      );
     },
   });
 

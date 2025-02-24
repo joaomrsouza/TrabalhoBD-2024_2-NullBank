@@ -52,7 +52,7 @@ export function ContasForm(props: ContasFormProps) {
       toast.success(
         `Conta ${data?.num_conta} ${editando ? "atualizada" : "criada"} com sucesso!`,
       );
-      router.push(`/contas${editando ? "/" + num_conta : ""}`);
+      router.push(`/contas${data?.num_conta ? "/" + data.num_conta : ""}`);
     },
   });
 
