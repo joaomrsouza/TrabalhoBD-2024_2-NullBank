@@ -5,7 +5,7 @@ import { type CountResponse, type OpResponse } from ".";
 import { db } from "..";
 
 export type Transacao = {
-  contas_num_conta_destino: number;
+  contas_num_conta_destino: number | null;
   contas_num_conta_origem: number;
   data_hora: Date;
   num_transacao: number;

@@ -280,12 +280,12 @@ USE `Equipe521459` ;
 -- -----------------------------------------------------
 -- Placeholder table for view `Equipe521459`.`contas_por_gerente`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Equipe521459`.`contas_por_gerente` (`funcionarios_matricula_gerente` INT, `num_conta` INT, `tipo` INT, `saldo` INT, `cpf` INT, `nome` INT);
+-- CREATE TABLE IF NOT EXISTS `Equipe521459`.`contas_por_gerente` (`funcionarios_matricula_gerente` INT, `num_conta` INT, `tipo` INT, `saldo` INT, `cpf` INT, `nome` INT);
 
 -- -----------------------------------------------------
 -- Placeholder table for view `Equipe521459`.`transacoes_por_conta`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `Equipe521459`.`transacoes_por_conta` (`num_conta` INT, `num_transacao` INT, `tipo` INT, `valor` INT, `data_hora` INT, `contas_num_conta_destino` INT);
+-- CREATE TABLE IF NOT EXISTS `Equipe521459`.`transacoes_por_conta` (`num_conta` INT, `num_transacao` INT, `tipo` INT, `valor` INT, `data_hora` INT, `contas_num_conta_destino` INT);
 
 -- -----------------------------------------------------
 -- View `Equipe521459`.`contas_por_gerente`
